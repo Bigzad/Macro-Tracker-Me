@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Macro Calculator - Login</title>
+    
+    <!-- Console Log Capture for Debugging -->
+    <script>
+        window.debugLogs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            window.debugLogs.push({type: 'log', time: new Date().toISOString(), args: args});
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            window.debugLogs.push({type: 'error', time: new Date().toISOString(), args: args});
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            window.debugLogs.push({type: 'warn', time: new Date().toISOString(), args: args});
+            originalWarn.apply(console, args);
+        };
+        
+        // Function to export logs
+        window.exportLogs = function() {
+            const logsText = window.debugLogs.map(log => 
+                `[${log.time}] ${log.type.toUpperCase()}: ${log.args.join(' ')}`
+            ).join('\n');
+            
+            const blob = new Blob([logsText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'console-logs.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+        
+        // Auto-save logs to localStorage
+        setInterval(() => {
+            localStorage.setItem('debugLogs', JSON.stringify(window.debugLogs));
+        }, 100);
+        
+        // Debug logging system ready
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Simple Logger - Must load first to control logging -->
+
+    
+    <!-- Initialization Manager - Must load after simple logger -->
+    <script src="initialization-manager.js"></script>
+    
+    <!-- Supabase Authentication System -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-init.js"></script>
+
+
+    <script src="supabase-auth-wrapper.js"></script>
+
+<!-- COMPREHENSIVE ERROR HANDLING FOR AUTHENTICATION -->
+<script src="error-handling-system.js"></script>
+<script src="safe-json-handler.js"></script>
+<script src="enhanced-database-functions.js"></script>
+    
+    <!-- Security Middleware - Protects API endpoints -->
+    <script src="security-middleware.js"></script>
+    
+    <!-- Subscription Management System -->
+    <script src="subscription-manager.js"></script>
+    <script src="subscription-middleware.js"></script>
+
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Enhanced Auth Widget Configuration */
+        .auth-widget {
+            --color-primary: #667eea;
+            --color-primary-dark: #764ba2;
+        }
+
+        /* Auth widget container styles */
+        .auth-widget-container {
+            min-height: 450px !important;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Try to force name field display in various ways */
+        .auth-modal-content form {
+            display: block !important;
+        }
+
+        .auth-modal-content input[name="name"],
+        .auth-modal-content input[type="text"]:first-of-type {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+            width: 100% !important;
+        }
+
+        /* Force show any hidden name-related fields */
+        .auth-modal-content .auth-field:has(input[name="name"]) {
+            display: block !important;
+        }
+
+        /* Override any hiding styles */
+        .auth-modal-content [style*="display: none"] input[name="name"] {
+            display: block !important;
+        }
+        
+        /* Custom Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 320px;
+            max-width: 400px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-left: 4px solid #047857;
+        }
+        
+        .notification.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-left: 4px solid #b45309;
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-left: 4px solid #b91c1c;
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-left: 4px solid #1d4ed8;
+        }
+        
+        .notification-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-text {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .notification-message {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 12px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
+        /* Supabase Auth Modal Styling */
+        #supabase-auth-modal .auth-modal-content {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        /* Ensure auth modal appears with proper styling */
+        #supabase-auth-modal {
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Mobile Responsive Fixes */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        /* Notification responsive fixes */
+        .notification {
+            left: 10px;
+            right: 10px;
+            width: auto;
+            min-width: auto;
+            max-width: calc(100vw - 20px);
+            transform: translateX(0);
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
+        <div class="max-w-md w-full mx-4">
+            <!-- Logo/Brand Section -->
+            <div class="text-center mb-8">
+                <div class="inline-block p-4 bg-white bg-opacity-20 rounded-full mb-4">
+                    <i class="fas fa-calculator text-4xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">AI-Powered Macro Calculator</h1>
+                <p class="text-blue-100 text-lg">Personalized nutrition planning made simple</p>
+            </div>
+            
+            <!-- Access Card -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-3 bg-purple-100 rounded-full mb-4">
+                        <i class="fas fa-lock text-2xl text-purple-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Member Access Required</h2>
+                    <p class="text-gray-600">This application is invite-only. Please log in with your invited account to continue.</p>
+                </div>
+                
+                <!-- Login Button -->
+                <button onclick="handleAuth()" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-3">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In to Continue</span>
+                </button>
+                
+                <!-- Forgot Password Link -->
+                <div class="text-center mt-4">
+                    <a href="password-reset.html" class="text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors inline-flex items-center gap-2">
+                        <i class="fas fa-key text-xs"></i>
+                        Forgot your password?
+                    </a>
+                </div>
+                
+                <!-- Alternative Access Section -->
+                <div class="mt-6 space-y-4">
+                    <!-- Invite Code Option -->
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-start gap-3 mb-3">
+                            <i class="fas fa-ticket-alt text-green-500 mt-1"></i>
+                            <div>
+                                <h3 class="font-semibold text-green-800 mb-1">Have an Invite Code?</h3>
+                                <p class="text-green-700 text-sm">Use your invite code to create an account instantly.</p>
+                            </div>
+                        </div>
+                        <button onclick="showInviteCodeModal()" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                            <i class="fas fa-key mr-2"></i>
+                            Enter Invite Code
+                        </button>
+                    </div>
+                    
+                    <!-- Email Invitation Info -->
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                            <div>
+                                <h3 class="font-semibold text-blue-800 mb-1">Need Access?</h3>
+                                <p class="text-blue-700 text-sm">This app uses invite-only registration. Contact your administrator to request an invitation or invite code.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features Preview -->
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-700 mb-3 text-center">What's Inside</h3>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i class="fas fa-calculator text-purple-500"></i>
+                            <span>Macro Calculator</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i class="fas fa-chart-line text-purple-500"></i>
+                            <span>Progress Tracking</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i class="fas fa-utensils text-purple-500"></i>
+                            <span>Meal Planning</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <i class="fas fa-book-open text-purple-500"></i>
+                            <span>Recipe Database</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="text-center mt-6 text-blue-100 text-sm">
+                <p>Secure • Private • Invite-Only</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom Notification System
+        function showNotification(title, message, type = 'success', duration = 4000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                warning: 'fas fa-exclamation-triangle',
+                error: 'fas fa-times-circle',
+                info: 'fas fa-info-circle'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="${icons[type]} notification-icon"></i>
+                    <div class="notification-text">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-message">${message}</div>
+                    </div>
+                    <button class="notification-close" onclick="closeNotification(this.parentElement.parentElement)">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Trigger animation with mobile fix
+            setTimeout(() => {
+                notification.classList.add('show');
+                notification.style.opacity = '1';
+                notification.style.visibility = 'visible';
+            }, 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                closeNotification(notification);
+            }, duration);
+        }
+        
+        function closeNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.parentElement.removeChild(notification);
+                }
+            }, 300);
+        }
+
+        // Authentication will be implemented with Supabase
+        function initAuthentication() {
+            console.log('Authentication system to be implemented');
+            // Supabase auth will be added here
+        }
+        
+        // Placeholder functions for compatibility - replaced with full implementation below
+        
+        // Initialize Supabase Authentication System
+        function initSupabaseAuth() {
+            // Wait for authWrapper to be available
+            if (typeof authWrapper === 'undefined') {
+                setTimeout(initSupabaseAuth, 100);
+                return;
+            }
+            
+            // Simple Supabase Auth initialization
+            authWrapper.init();
+            
+            // Listen for authentication events
+            authWrapper.on('init', user => {
+                console.log('Auth system initialized');
+                // Check if user is already logged in
+                if (user) {
+                    // Check if this is a new signup from invite link
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isInviteFlow = urlParams.has('confirmation_url') || 
+                                       urlParams.has('token_hash') || 
+                                       urlParams.has('type') ||
+                                       !user.email_confirmed_at; // Also check if email not confirmed yet
+                    
+                    if (isInviteFlow) {
+                        console.log('Invite/signup flow detected - collecting user info first');
+                        // Add small delay to ensure signup form is processed
+                        setTimeout(() => {
+                            checkAndCollectUserName(user);
+                        }, 1500);
+                    } else {
+                        // Check if this is an invitation flow before redirecting
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                        const isInvitationFlow = urlParams.get('type') === 'invite' || 
+                                               hashParams.get('type') === 'invite' || 
+                                               window.location.hash.includes('type=invite');
+                        
+                        if (isInvitationFlow) {
+                            console.log('🚫 Blocking redirect - invitation flow detected, letting signup form handle it');
+                            return; // Don't redirect, let invitation flow complete
+                        }
+                        
+                        // Normal login flow - redirect to main app
+                        console.log('Normal login flow - redirecting to app');
+                        redirectToApp(user);
+                    }
+                }
+            });
+            
+            authWrapper.on('login', user => {
+                console.log('User logged in:', user.user_metadata.full_name || user.email);
+                
+                // Check if this is a fresh signup that needs name collection
+                const needsNameCollection = !user.user_metadata.full_name || 
+                                          user.user_metadata.full_name.trim() === '';
+                
+                if (needsNameCollection) {
+                    console.log('New user needs to complete profile');
+                    // Enhanced name collection system
+                    checkAndCollectUserName(user);
+                } else {
+                    // Existing user with complete profile
+                    console.log('Existing user with complete profile - redirecting');
+                    redirectToApp(user);
+                }
+            });
+            
+            // Comprehensive name collection function
+            function checkAndCollectUserName(user) {
+                const hasName = user.user_metadata.full_name && user.user_metadata.full_name.trim() !== '';
+                
+                if (!hasName) {
+                    console.log('User missing full name - collecting now');
+                    
+                    // Create professional name collection modal
+                    showNameCollectionModal(user);
+                } else {
+                    console.log('User has full name:', user.user_metadata.full_name);
+                    proceedWithLogin(user);
+                }
+            }
+            
+            // Professional name collection modal
+            function showNameCollectionModal(user) {
+                // Store user for saveUserName function
+                window.currentModalUser = user;
+                // Create modal HTML
+                const modalHTML = `
+                    <div id="name-collection-modal" style="
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.8);
+                        z-index: 999999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 20px;
+                    ">
+                        <div style="
+                            background: white;
+                            border-radius: 16px;
+                            padding: 30px;
+                            max-width: 400px;
+                            width: 100%;
+                            text-align: center;
+                            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        ">
+                            <div style="
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                margin: -30px -30px 20px -30px;
+                                padding: 20px 30px;
+                                border-radius: 16px 16px 0 0;
+                                color: white;
+                            ">
+                                <i class="fas fa-user-plus" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                <h2 style="margin: 0; font-size: 1.5rem;">Complete Your Profile</h2>
+                            </div>
+                            <p style="margin-bottom: 20px; color: #374151;">
+                                Please enter your full name to complete your account setup:
+                            </p>
+                            <input 
+                                type="text" 
+                                id="user-full-name-input" 
+                                placeholder="Enter your full name"
+                                style="
+                                    width: 100%;
+                                    padding: 12px 16px;
+                                    border: 2px solid #e5e7eb;
+                                    border-radius: 8px;
+                                    font-size: 1rem;
+                                    margin-bottom: 20px;
+                                    box-sizing: border-box;
+                                "
+                                autocomplete="name"
+                                required
+                            >
+                            <div style="display: flex; gap: 10px;">
+                                <button 
+                                    onclick="skipNameCollection()" 
+                                    style="
+                                        flex: 1;
+                                        padding: 12px 20px;
+                                        background: #f3f4f6;
+                                        color: #6b7280;
+                                        border: none;
+                                        border-radius: 8px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Skip for Now
+                                </button>
+                                <button 
+                                    onclick="saveUserName()" 
+                                    style="
+                                        flex: 2;
+                                        padding: 12px 20px;
+                                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                        color: white;
+                                        border: none;
+                                        border-radius: 8px;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                    "
+                                >
+                                    Save & Continue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add modal to page
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Focus on input
+                setTimeout(() => {
+                    document.getElementById('user-full-name-input').focus();
+                }, 100);
+                
+                // Handle Enter key
+                document.getElementById('user-full-name-input').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveUserName();
+                    }
+                });
+            }
+            
+            // Save user name function
+            window.saveUserName = async function() {
+                const nameInput = document.getElementById('user-full-name-input');
+                const fullName = nameInput.value.trim();
+                
+                if (fullName === '') {
+                    nameInput.style.borderColor = '#ef4444';
+                    nameInput.placeholder = 'Please enter your name';
+                    nameInput.focus();
+                    return;
+                }
+                
+                // Get current user from stored modal user
+                const user = window.currentModalUser;
+                if (user) {
+                    try {
+                        // Update user metadata using Supabase auth
+                        const { data, error } = await window.supabaseClient.auth.updateUser({
+                            data: { full_name: fullName }
+                        });
+                        
+                        if (error) {
+                            console.error('Error saving user name:', error);
+                        } else {
+                            console.log('User name saved successfully:', fullName);
+                        }
+                        
+                        // If user signed up with an invite code, redeem it now
+                        if (window.validInviteCode) {
+                            await redeemInviteCodeForUser(user, window.validInviteCode);
+                        }
+                        
+                        // Proceed with login
+                        removeNameModal();
+                        proceedWithLogin(user, fullName);
+                        
+                    } catch (error) {
+                        console.error('Error in user setup:', error);
+                        // Proceed anyway
+                        removeNameModal();
+                        proceedWithLogin(user, fullName);
+                    }
+                } else {
+                    console.warn('No user found, proceeding without saving name');
+                    removeNameModal();
+                    proceedWithLogin(null, fullName);
+                }
+            };
+
+            // Redeem invite code for user after successful registration
+            async function redeemInviteCodeForUser(user, inviteCodeInfo) {
+                try {
+                    const { data: inviteCodeData, type: codeType, code } = inviteCodeInfo;
+                    
+                    if (codeType === 'coach') {
+                        // Handle new coach invitation system
+                        
+                        // Create user profile with coach assignment and proper role
+                        const userProfileData = {
+                            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+                            user_id: user.id,
+                            user_email: user.email,
+                            user_name: user.user_metadata?.full_name || user.email,
+                            role: 'client', // Proper role assignment for coach invites
+                            assignment_status: 'assigned',
+                            assigned_coach: inviteCodeData.coach_email,
+                            assigned_coach_email: inviteCodeData.coach_email,
+                            coach_user_id: inviteCodeData.coach_user_id,  // Store coach's UUID for better relationships
+                            coach_invite_code: code,
+                            coach_assignment_date: new Date().toISOString(),
+                            role_assigned_at: new Date().toISOString(),
+                            role_assigned_by: 'coach_invitation_' + code,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+
+                        const { error: profileError } = await window.supabaseClient
+                            .from('user_profiles')
+                            .insert([userProfileData]);
+
+                        if (profileError) {
+                            console.error('Error creating user profile:', profileError);
+                        }
+
+                        // Increment coach invitation code usage
+                        await window.supabaseClient
+                            .rpc('increment_invitation_code_usage', { input_code: code });
+
+                        console.log('Coach invitation code redeemed successfully:', code);
+                        console.log('User assigned to coach:', inviteCodeData.coach_email);
+                        
+                        // Show coach assignment success
+                        setTimeout(() => {
+                            showNotification('Welcome to the Team!', `You've been assigned to coach ${inviteCodeData.coach_name}!`, 'success');
+                        }, 1000);
+                        
+                    } else if (codeType === 'admin') {
+                        // Handle old admin invite system
+                        
+                        // Record the redemption
+                        const redemptionData = {
+                            invite_code_id: inviteCodeData.id,
+                            code: code,
+                            user_id: user.id,
+                            user_email: user.email,
+                            coach_email: inviteCodeData.coach_email,
+                            redeemed_at: new Date().toISOString(),
+                            metadata: {
+                                full_name: user.user_metadata?.full_name,
+                                email: user.email
+                            }
+                        };
+
+                        const { error: redemptionError } = await window.supabaseClient
+                            .from('invite_code_redemptions')
+                            .insert([redemptionData]);
+
+                        if (redemptionError) {
+                            console.error('Error recording redemption:', redemptionError);
+                        }
+
+                        // Create user profile for admin invite (with appropriate role)
+                        const adminUserProfileData = {
+                            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+                            user_id: user.id,
+                            user_email: user.email,
+                            user_name: user.user_metadata?.full_name || user.email,
+                            role: 'client', // Default to client for admin invites, can be changed later
+                            assignment_status: 'unassigned', // Admin invites don't auto-assign to coach
+                            coach_invite_code: code,
+                            role_assigned_at: new Date().toISOString(),
+                            role_assigned_by: 'admin_invitation_' + code,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+
+                        const { error: adminProfileError } = await window.supabaseClient
+                            .from('user_profiles')
+                            .insert([adminUserProfileData]);
+
+                        if (adminProfileError) {
+                            console.error('Error creating admin user profile:', adminProfileError);
+                        }
+
+                        // Update the admin invite code usage
+                        const { error: updateError } = await window.supabaseClient
+                            .from('invite_codes')
+                            .update({
+                                current_uses: inviteCodeData.current_uses + 1,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', inviteCodeData.id);
+
+                        if (updateError) {
+                            console.error('Error updating invite code:', updateError);
+                        }
+
+                        console.log('Admin invite code redeemed successfully:', code);
+                        
+                        // Show admin code success
+                        setTimeout(() => {
+                            showNotification('Welcome!', `Invite code "${code}" redeemed successfully!`, 'success');
+                        }, 1000);
+                    }
+                    
+                    // Clear the stored invite code
+                    delete window.validInviteCode;
+
+                } catch (error) {
+                    console.error('Failed to redeem invite code:', error);
+                }
+            }
+            
+            // Skip name collection
+            window.skipNameCollection = function() {
+                console.log('User skipped name collection');
+                const user = window.currentModalUser;
+                removeNameModal();
+                proceedWithLogin(user);
+            };
+            
+            // Remove name modal
+            function removeNameModal() {
+                const modal = document.getElementById('name-collection-modal');
+                if (modal) {
+                    modal.remove();
+                }
+                // Clean up stored user
+                window.currentModalUser = null;
+            }
+            
+            // Proceed with login after name collection
+            function proceedWithLogin(user, collectedName = null) {
+                const displayName = collectedName || user.user_metadata.full_name || user.email;
+                
+                showNotification('Welcome!', `Hello ${displayName}. Redirecting to application...`, 'success');
+                authWrapper.close();
+                
+                // Redirect to main app
+                setTimeout(() => {
+                    redirectToApp(user);
+                }, 1500);
+            }
+            
+            authWrapper.on('logout', () => {
+                console.log('User logged out');
+                showNotification('Signed Out', 'You have been logged out.', 'info');
+                // User is logged out, stay on login page
+            });
+            
+            authWrapper.on('error', err => {
+                console.error('Auth error:', err);
+                showNotification('Authentication Error', err.message || 'An error occurred during authentication.', 'error');
+            });
+            
+            authWrapper.on('close', () => {
+                console.log('Auth widget closed');
+            });
+        }
+        
+        // Initialize auth when page loads
+        initSupabaseAuth();
+        
+        // Redirect to main application
+        function redirectToApp(user) {
+            // Check if this is an invitation flow before redirecting
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const isInvitationFlow = hashParams.get('type') === 'invite' || 
+                                   window.location.hash.includes('type=invite');
+            
+            if (isInvitationFlow) {
+                console.log('🚫 redirectToApp() blocked - invitation flow detected');
+                console.log('User needs to complete signup form first');
+                return; // Don't redirect during invitation
+            }
+            
+            console.log('Redirecting authenticated user to main app...');
+            // Store authentication state
+            localStorage.setItem('authenticated', 'true');
+            localStorage.setItem('user_info', JSON.stringify({
+                name: user.user_metadata.full_name || user.email,
+                email: user.email
+            }));
+            
+            // Redirect to app.html
+            window.location.href = 'app.html';
+        }
+        
+        // Show invite code redemption modal
+        function showInviteCodeModal() {
+            const modalHTML = `
+                <div id="invite-code-modal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    z-index: 999999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                ">
+                    <div style="
+                        background: white;
+                        border-radius: 16px;
+                        padding: 30px;
+                        max-width: 450px;
+                        width: 100%;
+                        text-align: center;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    ">
+                        <div style="
+                            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                            margin: -30px -30px 20px -30px;
+                            padding: 20px 30px;
+                            border-radius: 16px 16px 0 0;
+                            color: white;
+                        ">
+                            <i class="fas fa-ticket-alt" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <h2 style="margin: 0; font-size: 1.5rem;">Enter Invitation Code</h2>
+                        </div>
+                        <p style="margin-bottom: 20px; color: #374151;">
+                            Enter your invitation code to create a new account:
+                        </p>
+                        <p style="margin-bottom: 15px; color: #6b7280; font-size: 0.875rem;">
+                            <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                            Supports both 8-character coach codes and 12-character admin codes
+                        </p>
+                        <input 
+                            type="text" 
+                            id="invite-code-input" 
+                            placeholder="Enter 8 or 12 character invite code"
+                            style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #e5e7eb;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                margin-bottom: 20px;
+                                box-sizing: border-box;
+                                text-align: center;
+                                font-family: monospace;
+                                letter-spacing: 1px;
+                            "
+                            maxlength="12"
+                            minlength="8"
+                            required
+                        >
+                        <div id="invite-code-error" style="
+                            color: #dc2626;
+                            font-size: 0.875rem;
+                            margin-bottom: 15px;
+                            min-height: 20px;
+                        "></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button 
+                                onclick="closeInviteCodeModal()" 
+                                style="
+                                    flex: 1;
+                                    padding: 12px 20px;
+                                    background: #f3f4f6;
+                                    color: #6b7280;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                "
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onclick="validateAndRedeemCode()" 
+                                style="
+                                    flex: 2;
+                                    padding: 12px 20px;
+                                    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                "
+                                id="redeem-code-btn"
+                            >
+                                <i class="fas fa-check mr-2"></i>
+                                Redeem Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('invite-code-input').focus();
+            }, 100);
+            
+            // Handle Enter key
+            document.getElementById('invite-code-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    validateAndRedeemCode();
+                }
+            });
+        }
+
+        // Close invite code modal
+        function closeInviteCodeModal() {
+            const modal = document.getElementById('invite-code-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Validate and redeem invite code
+        async function validateAndRedeemCode() {
+            const codeInput = document.getElementById('invite-code-input');
+            const errorDiv = document.getElementById('invite-code-error');
+            const redeemBtn = document.getElementById('redeem-code-btn');
+            
+            const inviteCode = codeInput.value.trim().toUpperCase();
+            
+            // Clear previous errors
+            errorDiv.textContent = '';
+            
+            // Basic validation
+            if (!inviteCode) {
+                errorDiv.textContent = 'Please enter an invite code';
+                return;
+            }
+            
+            // Support both 8-character (coach) and 12-character (admin) codes
+            if (inviteCode.length !== 8 && inviteCode.length !== 12) {
+                errorDiv.textContent = 'Invite code must be 8 or 12 characters long';
+                return;
+            }
+            
+            // Show loading state
+            redeemBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Validating...';
+            redeemBtn.disabled = true;
+            
+            try {
+                let codeData = null;
+                let codeType = null;
+                
+                // Determine which system to check based on code length
+                if (inviteCode.length === 8) {
+                    // Check new coach invitation system
+                    const { data, error } = await window.supabaseClient
+                        .rpc('validate_invitation_code', { input_code: inviteCode });
+                    
+                    if (error) {
+                        throw new Error('Error validating coach invitation code');
+                    }
+                    
+                    if (!data || data.length === 0 || !data[0].is_valid) {
+                        throw new Error('Invalid or expired coach invitation code');
+                    }
+                    
+                    codeData = data[0];
+                    codeType = 'coach';
+                    
+                } else if (inviteCode.length === 12) {
+                    // Check old admin invite system
+                    const { data, error } = await window.supabaseClient
+                        .from('invite_codes')
+                        .select('*')
+                        .eq('code', inviteCode)
+                        .single();
+                    
+                    if (error || !data) {
+                        throw new Error('Invalid admin invite code');
+                    }
+                    
+                    // Check if code is still valid
+                    const now = new Date();
+                    const expiresAt = new Date(data.expires_at);
+                    
+                    if (now > expiresAt) {
+                        throw new Error('This invite code has expired');
+                    }
+                    
+                    if (!data.is_active) {
+                        throw new Error('This invite code has been deactivated');
+                    }
+                    
+                    if (data.current_uses >= data.max_uses && data.max_uses > 0) {
+                        throw new Error('This invite code has no remaining uses');
+                    }
+                    
+                    codeData = data;
+                    codeType = 'admin';
+                } else {
+                    throw new Error('Invalid code length');
+                }
+                
+                // Code is valid! Store it temporarily and redirect to invite.html
+                window.validInviteCode = {
+                    data: codeData,
+                    type: codeType,
+                    code: inviteCode
+                };
+                closeInviteCodeModal();
+                
+                // Show success message and redirect to invite.html with code parameter
+                showNotification('Valid Code!', 'Your invite code is valid. Redirecting to complete your account setup...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = `invite.html?code=${inviteCode}`;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Invite code validation error:', error);
+                errorDiv.textContent = error.message || 'Failed to validate invite code';
+                
+                // Reset button
+                redeemBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Redeem Code';
+                redeemBtn.disabled = false;
+            }
+        }
+
+        // Handle authentication button click
+        async function handleAuth() {
+            // Check if core authentication systems are available
+            if (typeof window.SupabaseAuth === 'undefined' && !window.supabaseClient) {
+                showNotification('Loading', 'Authentication system is loading. Please wait a moment...', 'info');
+                
+                // Try again after a short delay
+                setTimeout(() => {
+                    if (typeof window.SupabaseAuth !== 'undefined' || window.supabaseClient) {
+                        handleAuth();
+                    } else {
+                        showNotification('Authentication Unavailable', 'Authentication system is not loaded. Please refresh the page.', 'error');
+                    }
+                }, 1000);
+                return;
+            }
+            
+            try {
+                // Try to get current user using available authentication methods
+                let user = null;
+                
+                if (window.SupabaseAuth && window.SupabaseAuth.getCurrentUser) {
+                    user = await window.SupabaseAuth.getCurrentUser();
+                } else if (window.supabaseClient) {
+                    const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
+                    user = currentUser;
+                }
+                
+                if (user) {
+                    // DEBUG: Add detailed logging
+                    // User authentication detected
+                    
+                    // Check if this is an invitation signup (authenticated but profile incomplete)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Parse hash params correctly
+                    const typeParam = urlParams.get('type');
+                    const hashTypeParam = hashParams.get('type');
+                    const hashIncludes = window.location.hash.includes('type=invite');
+                    const noFullName = !user.user_metadata.full_name;
+                    
+                    const isInvitationFlow = typeParam === 'invite' || hashTypeParam === 'invite' || hashIncludes || noFullName;
+                    
+                    // Process authentication flow immediately
+                    if (isInvitationFlow) {
+                        console.log('✅ Invitation user detected - showing signup form for profile completion:', user.email);
+                        // Don't redirect - let them complete their profile
+                        if (window.authWrapper && window.authWrapper.open) {
+                            window.authWrapper.open('signup');
+                            showNotification('Complete Your Profile', 'Please complete your profile setup to continue.', 'info');
+                        }
+                    } else {
+                        // User is already logged in with complete profile, redirect to main app
+                        console.log('➡️ User already authenticated with complete profile, redirecting to app:', user.email);
+                        redirectToApp(user);
+                    }
+                } else {
+                    // User is not logged in, try to open auth modal or show message
+                    if (window.authWrapper && window.authWrapper.open) {
+                        window.authWrapper.open('login');
+                        showNotification('Sign In', 'Please use your account credentials to log in.', 'info');
+                    } else {
+                        // Fallback: Show informative message about authentication
+                        showNotification('Authentication Required', 
+                            'Please sign in to access the application. The authentication system will be available shortly.', 
+                            'info');
+                        console.log('ℹ️ Authentication wrapper not available, showing informative message');
+                    }
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showNotification('Authentication Error', 'Unable to check authentication status. Please try again.', 'error');
+            }
+        }
+        
+        // Initialize Supabase Auth when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Login page loaded');
+            
+            // Use initialization manager to check auth systems if available
+            function checkAuthSystems() {
+                // Check if Supabase Auth is available
+                if (typeof window.SupabaseAuth === 'undefined' || typeof window.authWrapper === 'undefined') {
+                    console.log('ℹ️ Standard auth wrapper not available, using core authentication systems');
+                    
+                    // Only show error notification if Supabase client is also not working
+                    if (!window.supabaseClient || !window.enhancedDB) {
+                        console.log('❌ Core authentication systems not available - showing configuration notice');
+                        setTimeout(() => {
+                            showNotification('Configuration Notice', 'Please ensure Supabase is properly configured. Check the console for details.', 'warning');
+                        }, 2000);
+                        return;
+                    } else {
+                        console.log('✅ Core authentication systems active - continuing without standard auth wrapper');
+                    }
+                } else {
+                    console.log('✅ Full Supabase Auth system available');
+                }
+                
+                // Auth is initialized automatically by authWrapper
+                console.log('Supabase Auth ready');
+            }
+            
+            // Check auth systems with proper debugging
+            function delayedAuthCheck() {
+                checkAuthSystems();
+            }
+            
+            // Give scripts time to load, then check auth systems
+            if (window.initManager) {
+                // Wait for a moment to let scripts load
+                setTimeout(delayedAuthCheck, 500);
+            } else {
+                setTimeout(delayedAuthCheck, 100);
+            }
+        });
+    </script>
+
+    <!-- Unified Auth Script -->
+    
+    <script>
+      // Define startAnimations function for page initialization
+      function startAnimations() {
+        console.log("Starting page animations and visual effects...");
+        
+        // Fade in main content
+        const mainContent = document.querySelector('main, .hero-section, #main-content');
+        if (mainContent) {
+          mainContent.style.opacity = '0';
+          mainContent.style.transition = 'opacity 0.6s ease-in-out';
+          setTimeout(() => {
+            mainContent.style.opacity = '1';
+          }, 100);
+        }
+        
+        // Animate feature cards with stagger effect
+        const featureCards = document.querySelectorAll('.feature-card, .bg-white.rounded-lg, .p-6');
+        featureCards.forEach((card, index) => {
+          if (card) {
+            card.style.transform = 'translateY(20px)';
+            card.style.opacity = '0';
+            card.style.transition = 'all 0.6s ease-out';
+            setTimeout(() => {
+              card.style.transform = 'translateY(0)';
+              card.style.opacity = '1';
+            }, 200 + (index * 100));
+          }
+        });
+        
+        // Animate buttons with hover effects
+        const buttons = document.querySelectorAll('.btn, button, .bg-blue-600, .bg-green-600');
+        buttons.forEach(button => {
+          if (button) {
+            button.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+            button.addEventListener('mouseenter', () => {
+              button.style.transform = 'translateY(-2px)';
+              button.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            });
+            button.addEventListener('mouseleave', () => {
+              button.style.transform = 'translateY(0)';
+              button.style.boxShadow = '';
+            });
+          }
+        });
+        
+        console.log("✅ Page animations initialized");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM loaded, starting unified auth...");
+
+        // Always start your CSS animations or other app logic
+        if (typeof startAnimations === "function") {
+          console.log("Running animations...");
+          startAnimations();
+        }
+
+        // Check for Supabase invite/confirmation link
+        if (window.location.hash && (window.location.hash.includes("access_token") || window.location.hash.includes("confirmation_token"))) {
+          console.log("Auth link detected:", window.location.hash);
+          
+          // Check if this is an invitation link - parse from HASH not search params
+          const urlParams = new URLSearchParams(window.location.search);
+          const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove # and parse
+          const isInvitationLink = urlParams.get('type') === 'invite' || hashParams.get('type') === 'invite';
+          
+          console.log("🔍 DEBUG: URL params type:", urlParams.get('type'));
+          console.log("🔍 DEBUG: Hash params type:", hashParams.get('type'));
+          console.log("Is invitation link:", isInvitationLink);
+
+          // Clean the URL to prevent breaking scripts
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState(null, "", cleanUrl);
+
+          // Wait a moment to ensure Supabase Auth is loaded
+          setTimeout(() => {
+            if (window.authWrapper) {
+              if (isInvitationLink) {
+                console.log("Opening Supabase Auth signup for invitation...");
+                window.authWrapper.open("signup");
+              } else {
+                console.log("Opening Supabase Auth login...");
+                window.authWrapper.open("login");
+              }
+
+              // Handle login success
+              window.authWrapper.on("login", () => {
+                console.log("Login successful, redirecting...");
+                document.location.href = "app.html"; // change if you want another page
+              });
+            } else {
+              console.error("Supabase Auth wrapper not found.");
+            }
+          }, 500);
+        } else {
+          console.log("Normal site load, no invite token.");
+        }
+      });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Macro Calculator</h3>
+                    <p class="text-gray-300 text-sm">Your AI-powered nutrition tracking companion.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Legal</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="disclaimer.html" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Disclaimer
+                        </a></li>
+                        <li><a href="privacy-policy.html" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="fas fa-shield-alt mr-1"></i>Privacy Policy
+                        </a></li>
+                        <li><a href="terms-of-service.html" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="fas fa-file-contract mr-1"></i>Terms of Service
+                        </a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">For Professionals</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="coach-login.html" class="text-green-400 hover:text-green-300 transition-colors inline-flex items-center">
+                            <i class="fas fa-dumbbell mr-2"></i>Coach Portal
+                        </a></li>
+                        <li><p class="text-gray-300">Are you a nutrition coach or trainer? Access your coaching dashboard.</p></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Macro Calculator. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<!-- Consent Notice Popup - Legal Compliance (Add to index.html) -->
+<div id="consent-popup" class="consent-popup-overlay hidden">
+    <div class="consent-popup-container">
+        <div class="consent-popup-content">
+            <!-- Header -->
+            <div class="consent-header">
+                <h2 class="consent-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Legal Notice & Consent
+                </h2>
+            </div>
+            
+            <!-- Content -->
+            <div class="consent-body">
+                <p class="consent-text">
+                    By using our AI-Powered Macro Calculator, you acknowledge that you have read and agree to our legal documents:
+                </p>
+                
+                <div class="consent-links">
+                    <a href="disclaimer.html" target="_blank" class="consent-link">
+                        <i class="fas fa-exclamation-triangle"></i> Disclaimer
+                    </a>
+                    <a href="privacy-policy.html" target="_blank" class="consent-link">
+                        <i class="fas fa-shield-alt"></i> Privacy Policy
+                    </a>
+                    <a href="terms-of-service.html" target="_blank" class="consent-link">
+                        <i class="fas fa-file-contract"></i> Terms of Service
+                    </a>
+                </div>
+                
+                <p class="consent-notice">
+                    <strong>Important:</strong> This app is for educational purposes only and does not provide medical advice. By continuing, you consent to our data processing practices and agree to use the app at your own risk.
+                </p>
+            </div>
+            
+            <!-- Footer with Both Buttons -->
+            <div class="consent-footer">
+                <div class="consent-buttons">
+                    <button id="consent-decline" class="consent-decline-btn">
+                        <i class="fas fa-times"></i>
+                        Decline
+                    </button>
+                    <button id="consent-accept" class="consent-accept-btn">
+                        <i class="fas fa-check"></i>
+                        Accept & Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Consent Popup Styles - Clean & Mobile-Friendly */
+.consent-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Hide popup when not needed */
+.consent-popup-overlay.hidden {
+    display: none;
+}
+
+/* Main container */
+.consent-popup-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Content wrapper */
+.consent-popup-content {
+    padding: 0;
+}
+
+/* Header section */
+.consent-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 16px 16px 0 0;
+}
+
+.consent-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Body section */
+.consent-body {
+    padding: 24px;
+}
+
+.consent-text {
+    margin: 0 0 20px 0;
+    color: #374151;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Legal document links */
+.consent-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.consent-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    color: #3b82f6;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.consent-link:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+    transform: translateX(4px);
+}
+
+/* Important notice */
+.consent-notice {
+    margin: 20px 0 0 0;
+    padding: 16px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    color: #92400e;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Footer section */
+.consent-footer {
+    padding: 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 0 0 16px 16px;
+}
+
+/* Button container */
+.consent-buttons {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+}
+
+/* Decline button */
+.consent-decline-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.consent-decline-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+    color: #374151;
+    transform: translateY(-1px);
+}
+
+.consent-decline-btn:active {
+    transform: translateY(0);
+}
+
+/* Accept button */
+.consent-accept-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.consent-accept-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.consent-accept-btn:active {
+    transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .consent-popup-overlay {
+        padding: 10px;
+    }
+    
+    .consent-header {
+        padding: 20px;
+    }
+    
+    .consent-title {
+        font-size: 1.3rem;
+    }
+    
+    .consent-body {
+        padding: 20px;
+    }
+    
+    .consent-footer {
+        padding: 20px;
+    }
+    
+    .consent-links {
+        padding: 12px;
+    }
+    
+    .consent-link {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Larger screens - horizontal button layout */
+@media (min-width: 480px) {
+    .consent-buttons {
+        flex-direction: row;
+    }
+    
+    .consent-decline-btn,
+    .consent-accept-btn {
+        flex: 1;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .consent-popup-container {
+        margin: 0;
+        border-radius: 12px;
+    }
+    
+    .consent-header {
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .consent-footer {
+        border-radius: 0 0 12px 12px;
+    }
+}
+</style>
+
+<script>
+// Consent Popup JavaScript - Legal Compliance Handler
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Configuration
+    const CONSENT_KEY = 'macro_calculator_consent_accepted';
+    const CONSENT_VERSION = '1.0';
+    
+    // DOM Elements
+    const consentPopup = document.getElementById('consent-popup');
+    const acceptButton = document.getElementById('consent-accept');
+    const declineButton = document.getElementById('consent-decline');
+    
+    // Check if consent has already been given
+    function hasUserConsented() {
+        const storedConsent = localStorage.getItem(CONSENT_KEY);
+        return storedConsent === CONSENT_VERSION;
+    }
+    
+    // Show the consent popup
+    function showConsentPopup() {
+        if (consentPopup) {
+            consentPopup.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            console.log('Consent popup displayed - first visit detected');
+        }
+    }
+    
+    // Hide the consent popup
+    function hideConsentPopup() {
+        if (consentPopup) {
+            consentPopup.classList.add('hidden');
+            document.body.style.overflow = '';
+            console.log('Consent popup hidden');
+        }
+    }
+    
+    // Store user consent in localStorage
+    function storeConsent() {
+        localStorage.setItem(CONSENT_KEY, CONSENT_VERSION);
+        localStorage.setItem(CONSENT_KEY + '_timestamp', Date.now());
+        console.log('User consent stored - popup will not show again');
+    }
+    
+    // Handle accept button click
+    function handleAcceptConsent() {
+        storeConsent();
+        hideConsentPopup();
+        console.log('Legal consent accepted - app fully initialized');
+    }
+    
+    // Handle decline button click
+    function handleDeclineConsent() {
+        console.log('User declined consent - redirecting to access denied page');
+        window.location.href = 'access-denied.html';
+    }
+    
+    // Initialize consent system
+    function initializeConsentSystem() {
+        // Check if user has already consented
+        if (hasUserConsented()) {
+            console.log('User has previously consented - popup skipped');
+            return;
+        }
+        
+        // Show popup for first-time visitors
+        showConsentPopup();
+        
+        // Attach event listeners to both buttons
+        if (acceptButton) {
+            acceptButton.addEventListener('click', handleAcceptConsent);
+        }
+        
+        if (declineButton) {
+            declineButton.addEventListener('click', handleDeclineConsent);
+        }
+        
+        // Prevent closing popup by clicking outside
+        if (consentPopup) {
+            consentPopup.addEventListener('click', function(event) {
+                if (event.target === consentPopup) {
+                    event.preventDefault();
+                    const container = consentPopup.querySelector('.consent-popup-container');
+                    container.style.animation = 'none';
+                    setTimeout(() => {
+                        container.style.animation = 'slideUp 0.3s ease-out';
+                    }, 10);
+                }
+            });
+        }
+    }
+    
+    // Start the consent system
+    initializeConsentSystem();
+    
+    // Public API for manual consent management
+    window.ConsentManager = {
+        hasConsent: hasUserConsented,
+        clearConsent: function() {
+            localStorage.removeItem(CONSENT_KEY);
+            localStorage.removeItem(CONSENT_KEY + '_timestamp');
+            console.log('Consent cleared - popup will show on next visit');
+        },
+        showPopup: showConsentPopup,
+        hidePopup: hideConsentPopup,
+        simulateDecline: handleDeclineConsent
+    };
+});
+</script>
+
+</body>
+</html>

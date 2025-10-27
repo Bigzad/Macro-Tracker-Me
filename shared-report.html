@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Progress Report - Macro Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Supabase System -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script src="production-config.js"></script>
+    <script src="supabase-init.js"></script>
+    
+    <style>
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+        }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .mobile-card {
+                margin: 0.5rem;
+                border-radius: 1rem;
+            }
+            
+            .mobile-text {
+                font-size: 0.875rem;
+                line-height: 1.25;
+            }
+        }
+
+        /* Professional Notification System */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            margin-bottom: 12px;
+            padding: 16px 20px;
+            border-left: 4px solid;
+            transform: translateX(450px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.hide {
+            transform: translateX(450px);
+            opacity: 0;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #6b7280;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 8px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+
+        .notification-close:hover {
+            color: #374151;
+        }
+
+        /* Notification Types */
+        .notification.error {
+            border-left-color: #ef4444;
+        }
+
+        .notification.error .notification-icon {
+            color: #ef4444;
+        }
+
+        .notification.success {
+            border-left-color: #22c55e;
+        }
+
+        .notification.success .notification-icon {
+            color: #22c55e;
+        }
+
+        .notification.info {
+            border-left-color: #3b82f6;
+        }
+
+        .notification.info .notification-icon {
+            color: #3b82f6;
+        }
+
+        .notification.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .notification.warning .notification-icon {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container"></div>
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="text-xl font-bold text-gray-900">
+                        <i class="fas fa-chart-line mr-2 text-blue-600"></i>Progress Report
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="download-button" onclick="downloadReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors hidden">
+                        <i class="fas fa-download mr-2"></i>Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-12">
+            <div class="inline-block p-4 bg-blue-50 rounded-full mb-4">
+                <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+            </div>
+            <h2 class="text-lg font-medium text-gray-900 mb-2">Loading Report...</h2>
+            <p class="text-gray-500">Please wait while we retrieve your shared report</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="text-center py-12 hidden">
+            <div class="inline-block p-4 bg-red-50 rounded-full mb-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+            </div>
+            <h2 class="text-lg font-medium text-gray-900 mb-2">Report Not Available</h2>
+            <p class="text-gray-500 mb-4" id="error-message">This report link may have expired or is no longer available.</p>
+            <a href="/" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Go to Home Page
+            </a>
+        </div>
+
+        <!-- Report Content -->
+        <div id="report-content" class="hidden">
+            <!-- Report Header -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 id="report-title" class="text-2xl font-bold text-gray-900 mb-2"></h1>
+                        <div class="flex flex-col sm:flex-row sm:items-center text-sm text-gray-600 space-y-1 sm:space-y-0 sm:space-x-4">
+                            <span id="report-client">
+                                <i class="fas fa-user mr-1"></i>Client: <span class="font-medium"></span>
+                            </span>
+                            <span id="report-period">
+                                <i class="fas fa-calendar mr-1"></i>Period: <span class="font-medium"></span>
+                            </span>
+                            <span id="report-type">
+                                <i class="fas fa-chart-line mr-1"></i>Type: <span class="font-medium"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 sm:mt-0">
+                        <span id="report-status" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Metrics -->
+            <div id="report-metrics" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Metrics will be dynamically inserted here -->
+            </div>
+
+            <!-- Share Info -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>This report was shared with you by:</strong> <span id="shared-by-coach"></span>
+                        </p>
+                        <p class="text-xs text-blue-600 mt-1" id="share-expiration"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Shared Report Viewer - Standalone Application
+        
+        let shareToken = null;
+        let reportData = null;
+        let shareData = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSharedReportViewer();
+        });
+
+        async function initializeSharedReportViewer() {
+            try {
+                console.log('🔍 Initializing shared report viewer...');
+                
+                // Get share token from URL
+                shareToken = getShareTokenFromURL();
+                
+                if (!shareToken) {
+                    showError('Invalid Link', 'No share token found in URL');
+                    return;
+                }
+
+                console.log('📊 Loading shared report with token:', shareToken);
+                await loadSharedReport();
+
+            } catch (error) {
+                console.error('❌ Failed to initialize shared report viewer:', error);
+                showError('Initialization Error', error.message);
+            }
+        }
+
+        function getShareTokenFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('token');
+        }
+
+        async function loadSharedReport() {
+            try {
+                // First, validate the share token and get share info
+                const { data: shareRecord, error: shareError } = await window.supabaseClient
+                    .from('report_shares')
+                    .select(`
+                        *,
+                        progress_reports (
+                            id,
+                            report_title,
+                            client_name,
+                            client_email,
+                            report_type,
+                            date_from,
+                            date_to,
+                            report_status,
+                            created_at,
+                            report_data
+                        )
+                    `)
+                    .eq('share_token', shareToken)
+                    .eq('is_active', true)
+                    .single();
+
+                if (shareError || !shareRecord) {
+                    throw new Error('Report not found or access has been revoked');
+                }
+
+                // Check if expired
+                if (shareRecord.expires_at && new Date(shareRecord.expires_at) < new Date()) {
+                    throw new Error('This shared report has expired');
+                }
+
+                shareData = shareRecord;
+                reportData = shareRecord.progress_reports;
+
+                // Update access count
+                await window.supabaseClient
+                    .from('report_shares')
+                    .update({ 
+                        access_count: (shareRecord.access_count || 0) + 1,
+                        last_accessed: new Date().toISOString()
+                    })
+                    .eq('id', shareRecord.id);
+
+                // Display the report
+                displayReport();
+                
+                // Hide loading, show content
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('report-content').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('❌ Failed to load shared report:', error);
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('error-state').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        function displayReport() {
+            // Report Header
+            document.getElementById('report-title').textContent = reportData.report_title || 'Progress Report';
+            document.querySelector('#report-client span').textContent = reportData.client_name || 'Unknown Client';
+            document.querySelector('#report-period span').textContent = `${formatDate(reportData.date_from)} - ${formatDate(reportData.date_to)}`;
+            document.querySelector('#report-type span').textContent = (reportData.report_type || 'weekly').charAt(0).toUpperCase() + (reportData.report_type || 'weekly').slice(1);
+            
+            // Report Status
+            const statusBadge = document.getElementById('report-status');
+            const status = reportData.report_status || 'draft';
+            statusBadge.textContent = status.toUpperCase();
+            statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusClass(status)}`;
+
+            // Share Info
+            document.getElementById('shared-by-coach').textContent = shareData.shared_by_coach_email;
+            const expirationElement = document.getElementById('share-expiration');
+            if (shareData.expires_at) {
+                expirationElement.textContent = `This link expires on ${formatDate(shareData.expires_at)}`;
+            } else {
+                expirationElement.textContent = 'This link does not expire';
+            }
+
+            // Show download button if allowed
+            if (shareData.can_download) {
+                document.getElementById('download-button').classList.remove('hidden');
+            }
+
+            // Display report metrics/data
+            displayReportMetrics();
+        }
+
+        function displayReportMetrics() {
+            const metricsContainer = document.getElementById('report-metrics');
+            
+            if (reportData.report_data) {
+                try {
+                    const data = typeof reportData.report_data === 'string' ? JSON.parse(reportData.report_data) : reportData.report_data;
+                    
+                    // Create metric cards based on available data
+                    const metrics = [];
+                    
+                    if (data.nutrition_summary) {
+                        metrics.push(createNutritionCard(data.nutrition_summary));
+                    }
+                    
+                    if (data.progress_summary) {
+                        metrics.push(createProgressCard(data.progress_summary));
+                    }
+                    
+                    if (data.adherence_summary) {
+                        metrics.push(createAdherenceCard(data.adherence_summary));
+                    }
+
+                    metricsContainer.innerHTML = metrics.join('');
+                    
+                } catch (error) {
+                    console.error('Error parsing report data:', error);
+                    metricsContainer.innerHTML = createPlaceholderMetrics();
+                }
+            } else {
+                metricsContainer.innerHTML = createPlaceholderMetrics();
+            }
+        }
+
+        function createNutritionCard(nutrition) {
+            return `
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">
+                        <i class="fas fa-utensils text-green-600 mr-2"></i>Nutrition Summary
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Average Calories:</span>
+                            <span class="font-medium">${nutrition.avg_calories || 'N/A'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Average Protein:</span>
+                            <span class="font-medium">${nutrition.avg_protein || 'N/A'}g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Average Carbs:</span>
+                            <span class="font-medium">${nutrition.avg_carbs || 'N/A'}g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Average Fat:</span>
+                            <span class="font-medium">${nutrition.avg_fat || 'N/A'}g</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createProgressCard(progress) {
+            return `
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">
+                        <i class="fas fa-chart-line text-blue-600 mr-2"></i>Progress Summary
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Days Tracked:</span>
+                            <span class="font-medium">${progress.days_tracked || 0}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Meals Logged:</span>
+                            <span class="font-medium">${progress.meals_logged || 0}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Goal Achievement:</span>
+                            <span class="font-medium">${progress.goal_achievement || 'N/A'}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAdherenceCard(adherence) {
+            return `
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">
+                        <i class="fas fa-target text-purple-600 mr-2"></i>Adherence Score
+                    </h3>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-600 mb-2">${adherence.overall_score || 0}%</div>
+                        <div class="text-sm text-gray-600">Overall Adherence</div>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>Calories:</span>
+                            <span>${adherence.calories_adherence || 0}%</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>Protein:</span>
+                            <span>${adherence.protein_adherence || 0}%</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>Carbs:</span>
+                            <span>${adherence.carbs_adherence || 0}%</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span>Fat:</span>
+                            <span>${adherence.fat_adherence || 0}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createPlaceholderMetrics() {
+            return `
+                <div class="col-span-full bg-white rounded-lg shadow p-6 text-center">
+                    <div class="inline-block p-3 bg-gray-100 rounded-full mb-4">
+                        <i class="fas fa-chart-bar text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-600 mb-2">Report Data Processing</h3>
+                    <p class="text-gray-500">This report is being processed. Detailed metrics will be available soon.</p>
+                </div>
+            `;
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'completed':
+                    return 'bg-green-100 text-green-800';
+                case 'in_progress':
+                case 'generating':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'draft':
+                    return 'bg-gray-100 text-gray-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown date';
+            try {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                return 'Invalid date';
+            }
+        }
+
+        function downloadReport() {
+            if (!shareData.can_download) {
+                showError('Download Not Allowed', 'Download permission has not been granted for this report.');
+                return;
+            }
+            
+            // Implement PDF generation
+            try {
+                generatePDF();
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                showError('Download Failed', 'Unable to generate PDF. Please try again.');
+            }
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add content to PDF
+            doc.setFontSize(20);
+            doc.text(reportData.report_title || 'Progress Report', 20, 30);
+            
+            doc.setFontSize(12);
+            doc.text(`Client: ${reportData.client_name || 'Unknown Client'}`, 20, 50);
+            doc.text(`Period: ${formatDate(reportData.date_from)} - ${formatDate(reportData.date_to)}`, 20, 60);
+            doc.text(`Type: ${(reportData.report_type || 'weekly').charAt(0).toUpperCase() + (reportData.report_type || 'weekly').slice(1)}`, 20, 70);
+            doc.text(`Generated: ${formatDate(reportData.created_at)}`, 20, 80);
+            
+            // Add more content based on report data
+            doc.text('Report shared via NutriTracker Pro', 20, 100);
+            
+            // Save the PDF
+            const fileName = `${reportData.report_title || 'Progress_Report'}_${reportData.client_name || 'Client'}.pdf`;
+            doc.save(fileName);
+            
+            showSuccess('Download Complete', 'Report has been downloaded successfully.');
+        }
+
+        // Notification System
+        function showNotification(type, title, message) {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const iconClass = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            }[type] || 'fas fa-info-circle';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${iconClass}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('hide');
+                setTimeout(() => notification.remove(), 400);
+            }, 5000);
+        }
+
+        function showSuccess(title, message) {
+            showNotification('success', title, message);
+        }
+
+        function showError(title, message) {
+            showNotification('error', title, message);
+        }
+
+        function showInfo(title, message) {
+            showNotification('info', title, message);
+        }
+    </script>
+</body>
+</html>

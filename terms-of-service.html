@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Macro Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Supabase Authentication System -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script src="supabase-init.js"></script>
+    <script src="supabase-auth-wrapper.js"></script>
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .legal-content {
+            line-height: 1.7;
+        }
+        
+        .legal-content h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .legal-content h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .legal-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .legal-content ul, .legal-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .legal-content li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">
+                        <i class="fas fa-file-contract mr-3"></i>
+                        Terms of Service
+                    </h1>
+                    <p class="text-blue-100 mt-2">Rules and conditions for using our macro calculator</p>
+                </div>
+                <a href="index.html" class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to App
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <div class="legal-content text-gray-700">
+                <!-- Last Updated -->
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                    <p class="text-purple-800 font-semibold">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        Last Updated: September 13, 2025
+                    </p>
+                </div>
+
+                <!-- Terms of Service Content -->
+                <div class="prose prose-lg max-w-none">
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
+                    <p class="mb-6">
+                        Welcome to the AI-Powered Macro Calculator ("the App," "we," "our," or "us"). These Terms of Service ("Terms") govern your access to and use of the App. By using the App, you agree to these Terms, our <a href="privacy-policy.html" class="text-blue-600 hover:text-blue-800 underline">Privacy Policy</a>, and our <a href="disclaimer.html" class="text-blue-600 hover:text-blue-800 underline">Disclaimer</a>. If you do not agree, you must discontinue use immediately.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Eligibility</h2>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li>You must be at least 16 years old (or the minimum age required by law in your jurisdiction).</li>
+                        <li>By using the App, you confirm that you are legally capable of entering into this agreement.</li>
+                        <li>If you are using the App on behalf of a company or organization, you represent that you have the authority to bind them to these Terms.</li>
+                    </ul>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Purpose of the App</h2>
+                    <p class="mb-6">
+                        The App provides nutritional and macro-tracking tools. It is for informational and educational purposes only. It does not provide medical, dietary, or fitness advice. You are responsible for consulting qualified professionals before making changes to your diet or lifestyle.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">4. User Responsibilities</h2>
+                    <p class="mb-4">By using the App, you agree to:</p>
+                    <ol class="list-decimal pl-6 mb-6">
+                        <li>Provide accurate and truthful information when using the App.</li>
+                        <li>Use the App only for personal, non-commercial purposes (unless we grant express permission).</li>
+                        <li>Not misuse the App in any way, including attempting to hack, reverse-engineer, or exploit vulnerabilities.</li>
+                        <li>Respect intellectual property rights and not copy, reproduce, or distribute the App's content without authorization.</li>
+                    </ol>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Accounts and Access</h2>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li>You may need to create an account to access certain features.</li>
+                        <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+                        <li>You are liable for all activities under your account.</li>
+                        <li>If you suspect unauthorized access, notify us immediately.</li>
+                    </ul>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Intellectual Property</h2>
+                    <p class="mb-4">
+                        All rights, titles, and interests in the App, including but not limited to code, algorithms, design, logos, text, graphics, and features, are owned by or licensed to us.
+                    </p>
+                    <p class="mb-6">
+                        You are granted a limited, non-exclusive, non-transferable, revocable license to use the App solely for personal use.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">7. Payments and Subscriptions (If Applicable)</h2>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li>Certain features may require payment or subscription.</li>
+                        <li>Prices, billing cycles, and refund policies will be clearly disclosed before purchase.</li>
+                        <li>We may change pricing with prior notice.</li>
+                        <li>Failure to pay may result in suspension or termination of access.</li>
+                    </ul>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">8. Termination</h2>
+                    <p class="mb-4">We may suspend or terminate your access to the App if you:</p>
+                    <ul class="list-disc pl-6 mb-4">
+                        <li>Breach these Terms,</li>
+                        <li>Engage in fraudulent or harmful behavior,</li>
+                        <li>Violate applicable laws.</li>
+                    </ul>
+                    <p class="mb-6">
+                        You may stop using the App at any time. Upon termination, your right to use the App immediately ceases.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">9. Disclaimer of Warranties</h2>
+                    <p class="mb-4">
+                        The App is provided on an "AS IS" and "AS AVAILABLE" basis.
+                    </p>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li>We make no warranties, express or implied, regarding the App's accuracy, reliability, or suitability for your needs.</li>
+                        <li>We disclaim all warranties to the maximum extent permitted by law.</li>
+                    </ul>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">10. Limitation of Liability</h2>
+                    <p class="mb-4">To the fullest extent permitted by law:</p>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li>We are not liable for indirect, incidental, consequential, or punitive damages.</li>
+                        <li>Our total liability for any claim related to the App shall not exceed the amount you paid us (if any) during the last 12 months.</li>
+                    </ul>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">11. Indemnification</h2>
+                    <p class="mb-6">
+                        You agree to indemnify and hold harmless the App, its creators, employees, and affiliates from any claims, liabilities, damages, losses, or expenses (including legal fees) arising out of your use of the App or violation of these Terms.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">12. Governing Law</h2>
+                    <ul class="list-disc pl-6 mb-6">
+                        <li><strong>For users in the United States:</strong> These Terms are governed by the laws of the State of [Insert State], without regard to conflict of law principles.</li>
+                        <li><strong>For users in Canada:</strong> These Terms are governed by the laws of the Province of [Insert Province], and applicable Canadian laws.</li>
+                        <li><strong>For users in the European Union/UK:</strong> These Terms are governed by the laws of your member state, and applicable EU/UK regulations.</li>
+                    </ul>
+                    <p class="mb-6">
+                        Any disputes will be resolved in the competent courts of the respective jurisdiction.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">13. International Use</h2>
+                    <p class="mb-6">
+                        We make no guarantee that the App is available or appropriate in all locations. You are responsible for complying with local laws when accessing or using the App.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">14. Modifications to Terms</h2>
+                    <p class="mb-6">
+                        We may revise these Terms from time to time. If material changes are made, we will notify users (via email, notice in the App, or updated "Last Updated" date). Continued use of the App constitutes acceptance of the revised Terms.
+                    </p>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">15. Contact Us</h2>
+                    <p class="mb-4">
+                        If you have questions about these Terms, contact us at:
+                    </p>
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <p class="mb-2"><strong>Email:</strong> <a href="mailto:support@macromasterai.com" class="text-blue-600 hover:text-blue-800 underline">support@macromasterai.com</a></p>
+                        <p class="mb-2"><strong>Company/Developer Name:</strong> [To be specified]</p>
+                        <p><strong>Jurisdiction:</strong> [To be specified]</p>
+                    </div>
+
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-8">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-balance-scale text-orange-600 mt-1"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-orange-800">Jurisdictional Information Needed</h3>
+                                <p class="mt-1 text-sm text-orange-700">
+                                    Please note that specific state/province information is required for Section 12 (Governing Law) to complete the legal framework. The placeholders [Insert State] and [Insert Province] should be updated with your actual jurisdiction.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-file-contract text-blue-600 mt-1"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">Legal Agreement</h3>
+                                <p class="mt-1 text-sm text-blue-700">
+                                    By using the AI-Powered Macro Calculator, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service, along with our Privacy Policy and Disclaimer.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Macro Calculator</h3>
+                    <p class="text-gray-300 text-sm">Your AI-powered nutrition tracking companion.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="disclaimer.html" class="text-blue-400 hover:text-blue-300">Disclaimer</a></li>
+                        <li><a href="privacy-policy.html" class="text-blue-400 hover:text-blue-300">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html" class="text-blue-400 hover:text-blue-300">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
+                    <p class="text-gray-300 text-sm">For questions about these terms, please contact us.</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Macro Calculator. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<!-- Supabase Auth Events -->
+
+<script>
+  if (window.authWrapper) {
+    // Initialize
+    window.authWrapper.on("init", user => {
+      console.log("Supabase Auth initialized:", user);
+    });
+
+    // When a user logs in
+    window.authWrapper.on("login", user => {
+      console.log("User logged in:", user);
+      // No reload needed - just close the modal
+      window.authWrapper.close();
+    });
+
+    // When a user logs out
+    window.authWrapper.on("logout", () => {
+      console.log("User logged out");
+      window.location.reload();
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriTracker Pro - AI-Powered Nutrition Coaching Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, #667eea 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #764ba2 0%, transparent 50%);
+        }
+        
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-check {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🥗</div>
+                    <div>
+                        <div class="text-2xl font-bold gradient-text">NutriTracker Pro</div>
+                        <div class="text-sm text-gray-600">AI-Powered Nutrition Platform</div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#features" class="text-gray-700 hover:text-purple-600 transition-colors">Features</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-purple-600 transition-colors">Pricing</a>
+                    <a href="#testimonials" class="text-gray-700 hover:text-purple-600 transition-colors">Reviews</a>
+                    <a href="#pricing" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg hero-pattern min-h-screen flex items-center text-white relative overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="mb-6">
+                    <span class="inline-block bg-white bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        🚀 Transform Your Nutrition Journey Today
+                    </span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Master Your <span class="text-yellow-300">Nutrition</span><br>
+                    With AI-Powered <span class="text-green-300">Coaching</span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
+                    Join thousands of users who've transformed their health with personalized nutrition tracking, 
+                    AI-powered meal planning, and expert coaching support.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                    <a href="#pricing" class="bg-white text-purple-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 pulse-animation">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Start Your Journey - From $9.99/mo
+                    </a>
+                    <button onclick="playVideo()" class="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-700 transition-all">
+                        <i class="fas fa-play mr-2"></i>
+                        Watch Demo
+                    </button>
+                </div>
+                
+                <!-- Social Proof -->
+                <div class="flex flex-wrap justify-center items-center gap-8 text-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-yellow-400 border-2 border-white"></div>
+                            <div class="w-8 h-8 rounded-full bg-green-400 border-2 border-white"></div>
+                            <div class="w-8 h-8 rounded-full bg-blue-400 border-2 border-white"></div>
+                        </div>
+                        <span class="text-sm">10,000+ Happy Users</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <div class="flex text-yellow-400">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-sm ml-2">4.9/5 Rating</span>
+                    </div>
+                    <div class="text-sm">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        30-Day Money Back Guarantee
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 w-20 h-20 bg-yellow-400 rounded-full opacity-20 animate-bounce"></div>
+        <div class="absolute bottom-20 right-10 w-16 h-16 bg-green-400 rounded-full opacity-20 animate-pulse"></div>
+        <div class="absolute top-1/2 right-20 w-12 h-12 bg-blue-400 rounded-full opacity-20 animate-ping"></div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+                    Everything You Need to Succeed
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    From AI-powered meal planning to professional coaching support, 
+                    we've built the complete nutrition ecosystem for your success.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-brain text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">AI-Powered Analysis</h3>
+                    <p class="text-gray-600">Smart nutrition analysis that learns your preferences and optimizes your meal planning automatically.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-chart-line text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Progress Tracking</h3>
+                    <p class="text-gray-600">Comprehensive progress monitoring with detailed analytics and personalized insights.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Expert Coaching</h3>
+                    <p class="text-gray-600">Connect with certified nutrition coaches for personalized guidance and support.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-utensils text-2xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Meal Planning</h3>
+                    <p class="text-gray-600">Personalized meal plans based on your goals, preferences, and dietary restrictions.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-mobile-alt text-2xl text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Mobile Friendly</h3>
+                    <p class="text-gray-600">Access your nutrition data anywhere with our responsive web app that works on all devices.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="text-center p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Data Security</h3>
+                    <p class="text-gray-600">Enterprise-grade security with encrypted data storage and GDPR compliance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+                    Choose Your Plan
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    Whether you're starting your personal nutrition journey or building a coaching business, 
+                    we have the perfect plan for you.
+                </p>
+                
+                <!-- Toggle -->
+                <div class="inline-flex bg-white rounded-lg p-1 shadow-md">
+                    <button onclick="showIndividualPlans()" id="individual-tab" class="px-6 py-2 rounded-md text-purple-600 bg-purple-100 font-medium transition-all">
+                        Individual Plans
+                    </button>
+                    <button onclick="showCoachPlans()" id="coach-tab" class="px-6 py-2 rounded-md text-gray-600 hover:text-purple-600 font-medium transition-all">
+                        Coach Plans
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Individual Plans -->
+            <div id="individual-plans" class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Monthly Plan -->
+                <div class="pricing-card bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Monthly Plan</h3>
+                        <p class="text-gray-600 mb-6">Perfect for getting started</p>
+                        <div class="mb-6">
+                            <span class="text-5xl font-bold text-purple-600">$9.99</span>
+                            <span class="text-gray-600">/month</span>
+                        </div>
+                        <button onclick="selectPlan('client_monthly')" class="w-full bg-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-all transform hover:scale-105">
+                            Start Monthly Plan
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="feature-check w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Complete nutrition tracking</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="feature-check w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>AI-powered meal analysis</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="feature-check w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Progress reports & insights</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="feature-check w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Mobile app access</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="feature-check w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Email support</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Annual Plan (Popular) -->
+                <div class="pricing-card bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-2xl p-8 border-4 border-yellow-400 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-yellow-400 text-purple-700 px-6 py-2 rounded-full font-bold text-sm">
+                            BEST VALUE - Save $40!
+                        </span>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Annual Plan</h3>
+                        <p class="text-purple-100 mb-6">2 months free!</p>
+                        <div class="mb-2">
+                            <span class="text-5xl font-bold">$79.99</span>
+                            <span class="text-purple-200">/year</span>
+                        </div>
+                        <div class="text-sm text-purple-200 mb-6">
+                            <span class="line-through">$119.88</span> Save $39.89
+                        </div>
+                        <button onclick="selectPlan('client_annual')" class="w-full bg-white text-purple-600 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                            Start Annual Plan
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Everything in Monthly Plan</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span><strong>2 months completely FREE</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Priority customer support</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Advanced analytics dashboard</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Exclusive content & recipes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coach Plans (Hidden by default) -->
+            <div id="coach-plans" class="hidden grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <!-- Coach Starter -->
+                <div class="pricing-card bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Coach Starter</h3>
+                        <p class="text-gray-600 mb-6">Perfect for new coaches</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-blue-600">$29</span>
+                            <span class="text-gray-600">/month</span>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-6">Up to 5 clients</div>
+                        <button onclick="selectPlan('coach_starter')" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all">
+                            Start Coaching
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Manage up to 5 clients</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Coach dashboard</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Client progress tracking</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Invitation system</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Basic analytics</span>
+                        </div>
+                        <div class="text-xs text-gray-500 pt-2">
+                            Additional clients: $2/month each
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coach Pro (Popular) -->
+                <div class="pricing-card bg-gradient-to-br from-green-600 to-green-700 text-white rounded-2xl p-8 border-4 border-yellow-400 relative transform scale-105">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-yellow-400 text-green-700 px-4 py-1 rounded-full font-bold text-xs">
+                            MOST POPULAR
+                        </span>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Coach Pro</h3>
+                        <p class="text-green-100 mb-6">For growing practices</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold">$59</span>
+                            <span class="text-green-200">/month</span>
+                        </div>
+                        <div class="text-sm text-green-200 mb-6">Up to 20 clients</div>
+                        <button onclick="selectPlan('coach_pro')" class="w-full bg-white text-green-600 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all">
+                            Choose Pro
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span>Manage up to 20 clients</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span>Advanced analytics</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span>Bulk operations</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span>Custom meal plans</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span>Priority support</span>
+                        </div>
+                        <div class="text-xs text-green-200 pt-2">
+                            Additional clients: $2/month each
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coach Elite -->
+                <div class="pricing-card bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Coach Elite</h3>
+                        <p class="text-gray-600 mb-6">For established coaches</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-purple-600">$99</span>
+                            <span class="text-gray-600">/month</span>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-6">Up to 50 clients</div>
+                        <button onclick="selectPlan('coach_elite')" class="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                            Go Elite
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Manage up to 50 clients</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>White-label options</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>API access</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Custom branding</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Dedicated support</span>
+                        </div>
+                        <div class="text-xs text-gray-500 pt-2">
+                            Additional clients: $2/month each
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Money Back Guarantee -->
+            <div class="text-center mt-12">
+                <div class="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-full">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    30-Day Money Back Guarantee - No Questions Asked
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 gradient-bg">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-white">
+                    What Our Users Say
+                </h2>
+                <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                    Join thousands of satisfied users who've transformed their nutrition with NutriTracker Pro
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card rounded-2xl p-8 text-white">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-purple-700">SM</span>
+                        </div>
+                        <div>
+                            <div class="font-bold">Sarah M.</div>
+                            <div class="text-sm text-gray-300">Fitness Coach</div>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-200">
+                        "NutriTracker Pro has revolutionized how I manage my clients. The AI insights are incredible, 
+                        and my clients love the personalized meal plans. My business has grown 300% since using this platform!"
+                    </p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card rounded-2xl p-8 text-white">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-400 rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-purple-700">DJ</span>
+                        </div>
+                        <div>
+                            <div class="font-bold">David J.</div>
+                            <div class="text-sm text-gray-300">Personal User</div>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-200">
+                        "I've tried dozens of nutrition apps, but nothing comes close to this. The AI actually understands 
+                        my eating patterns and gives recommendations that work. Lost 25 pounds in 3 months!"
+                    </p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card rounded-2xl p-8 text-white">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center mr-4">
+                            <span class="font-bold text-purple-700">LR</span>
+                        </div>
+                        <div>
+                            <div class="font-bold">Lisa R.</div>
+                            <div class="text-sm text-gray-300">Nutrition Coach</div>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-200">
+                        "The coaching features are outstanding. I can manage 40+ clients effortlessly, and the automated 
+                        insights save me hours each week. This platform pays for itself many times over."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+                    Frequently Asked Questions
+                </h2>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="space-y-6">
+                    <div class="border border-gray-200 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-3">How does the AI-powered analysis work?</h3>
+                        <p class="text-gray-600">Our AI analyzes your eating patterns, preferences, and goals to provide personalized recommendations. It learns from your data to continuously improve suggestions for optimal nutrition outcomes.</p>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-3">Can I cancel my subscription anytime?</h3>
+                        <p class="text-gray-600">Yes! You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your current billing period.</p>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-3">How does the coach plan work?</h3>
+                        <p class="text-gray-600">Coach plans allow you to invite and manage clients within the platform. Your clients get free access to the app as part of your coaching subscription. If you exceed your client limit, additional clients are $2/month each.</p>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-3">Is my data secure?</h3>
+                        <p class="text-gray-600">Absolutely. We use enterprise-grade encryption and security measures. Your data is stored securely and is never shared with third parties without your explicit consent.</p>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-3">Do you offer a free trial?</h3>
+                        <p class="text-gray-600">We offer a 30-day money-back guarantee instead of a free trial. This allows you to experience the full platform without limitations and get a full refund if you're not satisfied.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 gradient-bg text-white text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                Ready to Transform Your Nutrition?
+            </h2>
+            <p class="text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
+                Join thousands of users who've already transformed their health with NutriTracker Pro. 
+                Start your journey today with our 30-day money-back guarantee.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <a href="#pricing" class="bg-white text-purple-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Get Started Now
+                </a>
+                <button onclick="openChat()" class="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-purple-700 transition-all">
+                    <i class="fas fa-comments mr-2"></i>
+                    Talk to Sales
+                </button>
+            </div>
+            
+            <div class="text-sm text-gray-300">
+                <i class="fas fa-lock mr-1"></i>
+                Secure payment • 30-day money back guarantee • Cancel anytime
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="text-2xl">🥗</div>
+                        <div class="text-xl font-bold">NutriTracker Pro</div>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        The most advanced AI-powered nutrition platform for individuals and coaches.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Product</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div><a href="#features" class="hover:text-white transition-colors">Features</a></div>
+                        <div><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">API</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">Integrations</a></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Support</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div><a href="#" class="hover:text-white transition-colors">Help Center</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">Contact Us</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">System Status</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">Community</a></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <div><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">Terms of Service</a></div>
+                        <div><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 NutriTracker Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Plan selection functions
+        function selectPlan(planCode) {
+            // Store selected plan
+            localStorage.setItem('selectedPlan', planCode);
+            
+            // Show loading state
+            event.target.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            event.target.disabled = true;
+            
+            // Simulate processing
+            setTimeout(() => {
+                // This is where Stripe checkout will be integrated
+                alert(`Selected plan: ${planCode}\n\nStripe checkout integration will be implemented here.`);
+                
+                // Reset button
+                event.target.innerHTML = getOriginalButtonText(planCode);
+                event.target.disabled = false;
+            }, 1500);
+        }
+        
+        function getOriginalButtonText(planCode) {
+            const buttonTexts = {
+                'client_monthly': 'Start Monthly Plan',
+                'client_annual': 'Start Annual Plan',
+                'coach_starter': 'Start Coaching',
+                'coach_pro': 'Choose Pro',
+                'coach_elite': 'Go Elite'
+            };
+            return buttonTexts[planCode] || 'Select Plan';
+        }
+        
+        // Plan toggle functions
+        function showIndividualPlans() {
+            document.getElementById('individual-plans').classList.remove('hidden');
+            document.getElementById('coach-plans').classList.add('hidden');
+            
+            document.getElementById('individual-tab').classList.add('text-purple-600', 'bg-purple-100');
+            document.getElementById('individual-tab').classList.remove('text-gray-600');
+            
+            document.getElementById('coach-tab').classList.add('text-gray-600');
+            document.getElementById('coach-tab').classList.remove('text-purple-600', 'bg-purple-100');
+        }
+        
+        function showCoachPlans() {
+            document.getElementById('individual-plans').classList.add('hidden');
+            document.getElementById('coach-plans').classList.remove('hidden');
+            
+            document.getElementById('coach-tab').classList.add('text-purple-600', 'bg-purple-100');
+            document.getElementById('coach-tab').classList.remove('text-gray-600');
+            
+            document.getElementById('individual-tab').classList.add('text-gray-600');
+            document.getElementById('individual-tab').classList.remove('text-purple-600', 'bg-purple-100');
+        }
+        
+        // Other interaction functions
+        function playVideo() {
+            alert('Demo video would open here');
+        }
+        
+        function openChat() {
+            alert('Chat support would open here');
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Analytics tracking (placeholder)
+        function trackEvent(eventName, planCode = null) {
+            console.log('Analytics:', eventName, planCode);
+            // Implement your analytics tracking here
+        }
+        
+        // Track page load
+        document.addEventListener('DOMContentLoaded', function() {
+            trackEvent('page_load');
+        });
+    </script>
+</body>
+</html>
