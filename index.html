@@ -1077,15 +1077,29 @@
 
         // Handle authentication button click
         async function handleAuth() {
-            // Check if core authentication systems are available
-            if (typeof window.SupabaseAuth === 'undefined' && !window.supabaseClient) {
-                showNotification('Loading', 'Authentication system is loading. Please wait a moment...', 'info');
-                
-                // Try again after a short delay
-                setTimeout(() => {
-                    if (typeof window.SupabaseAuth !== 'undefined' || window.supabaseClient) {
-                        handleAuth();
-                    } else {
+  try {
+    // Prompt user for email and password
+    const email = prompt("Enter your email:");
+    const password = prompt("Enter your password:");
+    if (!email || !password) {
+      showNotification("Input Required", "Please enter both email and password.", "warning");
+      return;
+    }
+    const { error } = await authWrapper.signIn(email, password);
+    if (error) {
+      showNotification("Login Failed", error.message || "Invalid credentials. Please try again.", "error");
+      console.error("Login error:", error);
+    } else {
+      showNotification("Success", "Signed in successfully! Redirecting...", "success");
+      setTimeout(() => {
+        location.href = "app.html";
+      }, 1000);
+    }
+  } catch (err) {
+    console.error("Authentication error:", err);
+    showNotification("Authentication Error", "Something went wrong. Please try again.", "error");
+  }
+} else {
                         showNotification('Authentication Unavailable', 'Authentication system is not loaded. Please refresh the page.', 'error');
                     }
                 }, 1000);
@@ -1753,20 +1767,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 </script>
-
-
-  <!-- Unified Supabase Auth System -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="auth-manager.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await authWrapper.init();
-      authWrapper.redirectIfAuthed('app.html');
-      authWrapper.on('login', () => location.href = 'app.html');
-      authWrapper.on('logout', () => location.href = 'index.html');
-    });
-  </script>
 
 
   <!-- Unified Supabase Auth System -->
