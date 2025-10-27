@@ -1077,29 +1077,15 @@
 
         // Handle authentication button click
         async function handleAuth() {
-  try {
-    // Prompt user for email and password
-    const email = prompt("Enter your email:");
-    const password = prompt("Enter your password:");
-    if (!email || !password) {
-      showNotification("Input Required", "Please enter both email and password.", "warning");
-      return;
-    }
-    const { error } = await authWrapper.signIn(email, password);
-    if (error) {
-      showNotification("Login Failed", error.message || "Invalid credentials. Please try again.", "error");
-      console.error("Login error:", error);
-    } else {
-      showNotification("Success", "Signed in successfully! Redirecting...", "success");
-      setTimeout(() => {
-        location.href = "app.html";
-      }, 1000);
-    }
-  } catch (err) {
-    console.error("Authentication error:", err);
-    showNotification("Authentication Error", "Something went wrong. Please try again.", "error");
-  }
-} else {
+            // Check if core authentication systems are available
+            if (typeof window.SupabaseAuth === 'undefined' && !window.supabaseClient) {
+                showNotification('Loading', 'Authentication system is loading. Please wait a moment...', 'info');
+                
+                // Try again after a short delay
+                setTimeout(() => {
+                    if (typeof window.SupabaseAuth !== 'undefined' || window.supabaseClient) {
+                        handleAuth();
+                    } else {
                         showNotification('Authentication Unavailable', 'Authentication system is not loaded. Please refresh the page.', 'error');
                     }
                 }, 1000);
@@ -1781,6 +1767,170 @@ document.addEventListener('DOMContentLoaded', function() {
       authWrapper.on('logout', () => location.href = 'index.html');
     });
   </script>
+
+<!-- Login Modal (Frosted Glass, Responsive) -->
+<div id="login-modal" class="login-modal-overlay">
+  <div class="login-modal-content">
+    <h2>Sign In</h2>
+    <p id="login-error" class="login-error"></p>
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Password" required />
+    <button id="login-submit">Login</button>
+    <button id="login-cancel" class="cancel">Cancel</button>
+  </div>
+</div>
+
+<style>
+  /* Overlay */
+  .login-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  /* Modal content */
+  .login-modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .login-modal-content h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .login-modal-content input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  .login-modal-content button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+  }
+
+  #login-submit {
+    background-color: #3F5B48;
+    color: white;
+  }
+
+  #login-submit:hover {
+    background-color: #2f4637;
+  }
+
+  #login-cancel {
+    background-color: transparent;
+    color: #555;
+  }
+
+  #login-cancel:hover {
+    color: #000;
+  }
+
+  .login-error {
+    color: #d9534f;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 20px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 480px) {
+    .login-modal-content {
+      width: 95%;
+      padding: 20px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('login-modal');
+    const openBtn = document.querySelector('#sign-in-btn, button[onclick="handleAuth()"]');
+    const cancelBtn = document.getElementById('login-cancel');
+    const submitBtn = document.getElementById('login-submit');
+    const emailField = document.getElementById('login-email');
+    const passField = document.getElementById('login-password');
+    const errorEl = document.getElementById('login-error');
+
+    function openModal() {
+      modal.style.display = 'flex';
+      emailField.focus();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      errorEl.textContent = '';
+      emailField.value = '';
+      passField.value = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    async function handleLogin() {
+      const email = emailField.value.trim();
+      const password = passField.value.trim();
+      if (!email || !password) {
+        errorEl.textContent = "Please enter both email and password.";
+        return;
+      }
+      try {
+        const { error } = await authWrapper.signIn(email, password);
+        if (error) {
+          errorEl.textContent = error.message || "Invalid credentials.";
+          if (typeof showNotification === 'function')
+            showNotification("Login Failed", error.message, "error");
+        } else {
+          if (typeof showNotification === 'function')
+            showNotification("Login Successful", "Redirecting...", "success");
+          setTimeout(() => location.href = 'app.html', 800);
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        errorEl.textContent = "An unexpected error occurred.";
+      }
+    }
+
+    submitBtn.addEventListener('click', handleLogin);
+    passField.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  });
+</script>
 
 </body>
 </html>
