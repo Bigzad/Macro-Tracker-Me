@@ -203,5 +203,11 @@ console.info("Initialization Manager (unified auth version) loaded.");
   }
   window.InitializationManager = InitializationManager;
 } else {
-  console.warn("InitializationManager already defined — skipped redeclaration.");
+  console.warn("InitializationManager already defined — resuming existing instance.");
+  if (window.initManager && typeof window.initManager.executeReadyCallbacks === "function") {
+    window.initManager.executeReadyCallbacks();
+  }
+  if (window.initManager && typeof window.initManager.startInitialization === "function") {
+    window.initManager.startInitialization();
+  }
 }
