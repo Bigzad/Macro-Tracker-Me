@@ -63,3 +63,13 @@
   window.authWrapper = { init, on, off, signIn, signUp, signOut, getSession, requireAuthOrRedirect, redirectIfAuthed };
   window.__AUTH_MANAGER_READY__ = true;
 })();
+
+// Safe attach for sign-in button (fallback)
+try {
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('#sign-in-btn');
+    if (btn && typeof window.handleAuth === 'function') {
+      btn.addEventListener('click', (e) => { e.preventDefault(); window.handleAuth(); });
+    }
+  });
+} catch (e) { /* silent */ }

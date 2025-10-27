@@ -41,8 +41,14 @@ class InitializationManager {
       this.components.set(name, instance);
       this.checkDependencies();
     } else {
-      console.warn(`Unknown component registration: ${name}`);
-    }
+  console.warn("InitializationManager already defined — resuming existing instance.");
+  if (window.initManager && typeof window.initManager.executeReadyCallbacks === "function") {
+    window.initManager.executeReadyCallbacks();
+  }
+  if (window.initManager && typeof window.initManager.startInitialization === "function") {
+    window.initManager.startInitialization();
+  }
+}
   }
 
   isComponentReady(name) {
