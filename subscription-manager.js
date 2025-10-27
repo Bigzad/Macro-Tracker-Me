@@ -1,3 +1,7 @@
+// ======= subscription-manager.js (final safe version) =======
+
+// Prevent redeclaration
+if (!window.SubscriptionManager) {
 if (!window.SubscriptionManager) {
 /**
  * SUBSCRIPTION MANAGEMENT SYSTEM
@@ -456,3 +460,27 @@ if (typeof module !== 'undefined' && module.exports) {
 }
   window.SubscriptionManager = SubscriptionManager;
 }
+
+  // ================================================
+  // GLOBAL INITIALIZATION
+  // ================================================
+
+  document.addEventListener('DOMContentLoaded', () => {
+      if (!window.subscriptionManager) {
+          window.subscriptionManager = new SubscriptionManager();
+      }
+  });
+
+  if (document.readyState !== 'loading' && !window.subscriptionManager) {
+      window.subscriptionManager = new SubscriptionManager();
+  }
+
+  // Expose globally once
+  window.SubscriptionManager = SubscriptionManager;
+  console.info("SubscriptionManager initialized.");
+
+} else {
+  console.info("SubscriptionManager already loaded, skipping redeclaration.");
+}
+
+// ======= END =======
