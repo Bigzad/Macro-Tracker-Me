@@ -46,3 +46,12 @@
     const s3 = $("mobile-unit-system"); if (s3) s3.value = saved;
   })();
 })();
+
+// ---- Auth buttons (logout) ----
+window.handleAuth = async function handleAuth() {
+  try {
+    if (window.supabaseClient?.auth) await window.supabaseClient.auth.signOut();
+  } catch (e) { console.error("Logout failed:", e); }
+  window.location.href = "index.html";
+};
+window.handleAuthMobile = window.handleAuth;
