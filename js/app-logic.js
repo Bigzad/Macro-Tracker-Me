@@ -1,89 +1,45 @@
-// Wait for Supabase to restore session
-    const session = await authWrapper.getSession();
+// app-logic.js — Fixed Version (Safe Async + Initialization Guard)
 
-    if (!session) {
-      console.warn("No active session found. Redirecting...");
-      location.href = "index.html";
-      return;
-    }
-
-    console.info("✅ Session validated, initializing app...");
-    
-    if (typeof initApp === "function") initApp();
-  } catch (err) {
-    console.error("Auth initialization error:", err);
-    location.href = "index.html";
-  }
-});
-    } catch (err) {
-      console.error("Auth initialization error:", err);
-      location.href = 'index.html';
-    }
-  });
-
-// Safe InitializationManager wrapper (singleton guard)
-  if (!window.InitializationManager) {
-    class InitializationManager {
-      constructor() {
-        if (window.initManager) return window.initManager;
-        window.initManager = this;
-        this.ready = false;
-      }
-    }
-    window.InitializationManager = InitializationManager;
-  }
-  if (!window.initManager) window.initManager = new window.InitializationManager();
-
-// Wait for Supabase to restore session
-    const session = await authWrapper.getSession();
-
-    if (!session) {
-      console.warn("No active session found. Redirecting...");
-      location.href = "index.html";
-      return;
-    }
-
-    console.info("✅ Session validated, initializing app...");
-    
-    if (typeof initApp === "function") initApp();
-  } catch (err) {
-    console.error("Auth initialization error:", err);
-    location.href = "index.html";
-  }
-});
-    } catch (err) {
-      console.error("Auth initialization error:", err);
-      location.href = 'index.html';
-    }
-  });
-
-// Safe InitializationManager wrapper (singleton guard)
-  if (!window.InitializationManager) {
-    class InitializationManager {
-      constructor() {
-        if (window.initManager) return window.initManager;
-        window.initManager = this;
-        this.ready = false;
-      }
-    }
-    window.InitializationManager = InitializationManager;
-  }
-  if (!window.initManager) window.initManager = new window.InitializationManager();
-document.addEventListener("DOMContentLoaded", async () => {
-  let tries = 0;
-  while ((!window.initManager || !window.initManager.sessionValidated) && tries < 50) {
-    await new Promise(r => setTimeout(r, 100));
-    tries++;
-  }
-  if (!window.initManager || !window.initManager.sessionValidated) {
-    console.warn("Session not validated by InitializationManager; aborting app init.");
-    return;
-  }
+(async () => {
   try {
+    if (!window.supabaseClient) {
+      console.error("Supabase client not initialized.");
+      return;
+    }
+
+    console.info("[app-logic] Starting app initialization...");
+
+    let waitCount = 0;
+    while ((!window.initManager || !window.initManager.sessionValidated) && waitCount < 50) {
+      await new Promise(r => setTimeout(r, 100));
+      waitCount++;
+    }
+
+    if (!window.initManager || !window.initManager.sessionValidated) {
+      console.warn("[app-logic] Session not validated by InitializationManager — redirecting to login.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const { data: { session } = {} } = await window.supabaseClient.auth.getSession();
+
+    if (!session) {
+      console.warn("[app-logic] No active session found. Redirecting...");
+      window.location.href = "index.html";
+      return;
+    }
+
+    console.info("✅ Session validated, initializing app...");
+
     if (typeof window.initApp === "function") {
       await window.initApp();
+      console.info("[app-logic] App initialized successfully.");
+    } else {
+      console.warn("[app-logic] initApp() not found.");
     }
-  } catch (e) {
-    console.error("App initialization failed:", e);
+
+  } catch (err) {
+    console.error("[app-logic] Initialization error:", err);
+    window.location.href = "index.html";
   }
-});
+})();
