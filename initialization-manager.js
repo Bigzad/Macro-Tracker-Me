@@ -106,10 +106,15 @@ if (!window.InitializationManager) {
         (window.authWrapper && (await window.authWrapper.getSession())) || null;
 
       if (!session) {
-        console.warn("No active session found. Redirecting to login...");
-        window.location.href = "index.html";
-        return;
-      }
+  const currentPage = window.location.pathname.split("/").pop();
+  if (!["index.html", "", "password-reset.html"].includes(currentPage)) {
+    console.warn("No active session found. Redirecting to login...");
+    window.location.href = "index.html";
+  } else {
+    console.info("No active session found (expected for public page).");
+  }
+  return;
+}
 
       this.sessionValidated = true;
       this.executeReadyCallbacks();
