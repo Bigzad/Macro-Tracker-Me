@@ -1,3 +1,6 @@
+// === SAFE SINGLETON VERSION ===
+// Prevent redeclaration of InitializationManager across reloads or multiple inclusions
+if (!window.InitializationManager) {
 /**
  * INITIALIZATION SEQUENCE MANAGER (Unified Auth Compatible)
  * ----------------------------------------------------------
@@ -193,3 +196,12 @@ window.safeGetEnhancedDB = window.initManager.createSafeAccessor("enhancedDB", {
 });
 
 console.info("Initialization Manager (unified auth version) loaded.");
+
+  // Assign global references once
+  if (typeof window.initManager === 'undefined') {
+    window.initManager = new InitializationManager();
+  }
+  window.InitializationManager = InitializationManager;
+} else {
+  console.warn("InitializationManager already defined — skipped redeclaration.");
+}
