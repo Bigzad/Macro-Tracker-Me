@@ -1,182 +1,78 @@
 /**
- * Security Middleware for API Protection
- * Protects sensitive API endpoints and manages fetch operations
+ * SECURITY MIDDLEWARE (Unified Auth Compatible, Fallback Mode)
+ * ------------------------------------------------------------
+ * - Works with auth-manager.js unified system
+ * - Attaches Supabase access_token only to Supabase REST API calls
+ * - Retries once on 401 Unauthorized
+ * - Operates in fallback mode (never blocks app)
+ * - Registers itself in initManager (if present)
+ * - Logs only warnings/errors (silent otherwise)
  */
 
-(function() {
-    'use strict';
-    
-    console.log('🔒 Security Middleware initializing...');
-    
-    // Store original fetch function before any modifications
-    if (!window.originalFetchStored) {
-        window.originalFetchStored = window.fetch.bind(window);
-        console.log('📦 Original fetch function stored');
-    }
-    
-    // Configuration
-    const config = {
-        // Protected endpoints that require authentication
-        protectedEndpoints: [
-            '/tables/',
-            '/admin/',
-            '/api/protected'
-        ],
-        
-        // Public endpoints that don't require authentication
-        publicEndpoints: [
-            '/api/public',
-            '/health',
-            '/status',
-            'supabase.co',
-            '/auth/v1',
-            'tables/'
-        ],
-        
-        // Development mode - allows bypassing for testing
-        developmentMode: true
-    };
-    
-    // Authentication check function
-    function isUserAuthenticated() {
-        try {
-            // Check for Supabase auth
-            if (window.SupabaseAuth && window.authWrapper) {
-                const user = window.authWrapper.currentUser;
-                return !!user;
-            }
-            
-            // Fallback checks
-            const token = localStorage.getItem('supabase.auth.token') || 
-                         sessionStorage.getItem('supabase.auth.token');
-            return !!token;
-        } catch (error) {
-            console.warn('🔍 Auth check error:', error);
-            return false;
-        }
-    }
-    
-    // Check if user is authorized coach using database roles
-    function isAuthorizedCoach() {
-        try {
-            // Check database-based role from global auth state
-            if (window.currentUserRole && window.currentUser) {
-                return ['coach', 'admin', 'owner'].includes(window.currentUserRole.role);
-            }
-            
-            // Fallback: Check if user is authenticated (for development mode)
-            if (config.developmentMode && window.authWrapper && window.authWrapper.currentUser) {
-                return true;
-            }
-            
-            return false;
-        } catch (error) {
-            console.warn('🔍 Coach auth check error:', error);
-            return false;
-        }
-    }
-    
-    // Check if endpoint is protected
-    function isProtectedEndpoint(url) {
-        return config.protectedEndpoints.some(endpoint => 
-            url.includes(endpoint)
-        );
-    }
-    
-    // Check if endpoint is public
-    function isPublicEndpoint(url) {
-        return config.publicEndpoints.some(endpoint => 
-            url.includes(endpoint)
-        );
-    }
-    
-    // Enhanced fetch wrapper with security
-    function secureFletch(url, options = {}) {
-        const fullUrl = typeof url === 'string' ? url : url.toString();
-        
-        // Log the request for debugging
-        console.log('🌐 Secure fetch request:', {
-            url: fullUrl,
-            method: options.method || 'GET',
-            authenticated: isUserAuthenticated(),
-            isCoach: isAuthorizedCoach()
-        });
-        
-        // Allow public endpoints without authentication
-        if (isPublicEndpoint(fullUrl)) {
-            console.log('✅ Public endpoint access allowed:', fullUrl);
-            return window.originalFetchStored(url, options);
-        }
-        
-        // Check for protected endpoints
-        if (isProtectedEndpoint(fullUrl)) {
-            const isAuthenticated = isUserAuthenticated();
-            const isCoach = isAuthorizedCoach();
-            
-            // In development mode, allow access for testing
-            if (config.developmentMode) {
-                console.log('🚧 Development mode: Allowing protected endpoint access:', fullUrl);
-                return window.originalFetchStored(url, options);
-            }
-            
-            // Require authentication for protected endpoints
-            if (!isAuthenticated) {
-                console.warn('🚫 Unauthorized access attempt to:', fullUrl);
-                return Promise.reject(new Error('Authentication required for this endpoint'));
-            }
-            
-            // For admin endpoints, require coach authorization
-            if (fullUrl.includes('/admin/') && !isCoach) {
-                console.warn('🚫 Insufficient privileges for admin endpoint:', fullUrl);
-                return Promise.reject(new Error('Admin privileges required for this endpoint'));
-            }
-            
-            console.log('✅ Authenticated access granted:', fullUrl);
-        }
-        
-        // Proceed with original fetch
-        return window.originalFetchStored(url, options);
-    }
-    
-    // Override global fetch with security wrapper
-    window.fetch = secureFletch;
-    
-    // Provide access to original fetch for authorized use
-    window.secureFetch = {
-        original: window.originalFetchStored,
-        secure: secureFletch,
-        config: config,
-        
-        // Helper methods
-        isAuthenticated: isUserAuthenticated,
-        isAuthorizedCoach: isAuthorizedCoach,
-        
+;(function () {
+  if (window.__SECURITY_MIDDLEWARE_READY__) return;
+  const SUPABASE_URL = "https://xnpsjajyjtczlxciatfy.supabase.co";
+  const ORIGINAL_FETCH = window.fetch;
 
-        
-        // Development mode control
-        setDevelopmentMode: function(enabled) {
-            config.developmentMode = enabled;
-            console.log('🔧 Development mode:', enabled ? 'enabled' : 'disabled');
-        }
-    };
-    
-    // Export for use in admin panels
-    window.SecurityMiddleware = {
-        config: config,
-        isAuthenticated: isUserAuthenticated,
-        isAuthorizedCoach: isAuthorizedCoach
-    };
-    
-    console.log('🔒 Security Middleware initialized successfully');
-    console.log('📋 Configuration:', {
-        protectedEndpoints: config.protectedEndpoints.length,
-        publicEndpoints: config.publicEndpoints.length,
-        developmentMode: config.developmentMode
-    });
-    
-    // Dispatch ready event
-    window.dispatchEvent(new CustomEvent('securityMiddlewareReady', {
-        detail: { config: config }
-    }));
-    
+  async function getAccessToken() {
+    try {
+      if (window.authWrapper && typeof window.authWrapper.getSession === "function") {
+        const session = await window.authWrapper.getSession();
+        return session?.access_token || null;
+      }
+      if (window.supabaseClient?.auth?.getSession) {
+        const { data } = await window.supabaseClient.auth.getSession();
+        return data?.session?.access_token || null;
+      }
+    } catch (err) {
+      console.warn("[security-middleware] Failed to get access token:", err);
+    }
+    return null;
+  }
+
+  async function securedFetch(input, init = {}) {
+    const url = typeof input === "string" ? input : input.url;
+    const isSupabase = url.startsWith(SUPABASE_URL);
+    let token = null;
+
+    // Try to get token safely
+    try {
+      token = await getAccessToken();
+    } catch (err) {
+      console.warn("[security-middleware] Token retrieval failed:", err);
+    }
+
+    // Clone init safely
+    const newInit = { ...init, headers: new Headers(init.headers || {}) };
+    if (isSupabase && token) {
+      newInit.headers.set("Authorization", `Bearer ${token}`);
+    } else if (isSupabase && !token) {
+      console.warn("[security-middleware] No token available for Supabase request (fallback mode).");
+    }
+
+    let response = await ORIGINAL_FETCH(input, newInit);
+    if (isSupabase && response.status === 401 && token) {
+      console.warn("[security-middleware] 401 detected, retrying once with refreshed token...");
+      const refreshed = await getAccessToken();
+      if (refreshed && refreshed !== token) {
+        newInit.headers.set("Authorization", `Bearer ${refreshed}`);
+        response = await ORIGINAL_FETCH(input, newInit);
+      }
+    }
+    return response;
+  }
+
+  try {
+    // Patch fetch globally
+    window.originalFetchStored = ORIGINAL_FETCH;
+    window.fetch = securedFetch;
+    window.__SECURITY_MIDDLEWARE_READY__ = true;
+
+    // Register with initManager if available
+    if (window.initManager && typeof window.initManager.registerComponent === "function") {
+      window.initManager.registerComponent("securityMiddleware", true);
+    }
+  } catch (err) {
+    console.error("[security-middleware] Initialization failed:", err);
+  }
 })();
