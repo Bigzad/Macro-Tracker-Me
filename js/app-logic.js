@@ -1,22 +1,22 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      await authWrapper.init();
-      await authWrapper.requireAuthOrRedirect('index.html');
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await new Promise(res => setTimeout(res, 500)); // Wait for Supabase to restore session
+    const session = await authWrapper.getSession();
 
-      // Live session check every 60s
-      setInterval(async () => {
-        const session = await authWrapper.getSession();
-        if (!session) {
-          console.warn("Session expired, redirecting to login...");
-          location.href = 'index.html';
-        }
-      }, 60000);
+    if (!session) {
+      console.warn("No active session found. Redirecting...");
+      location.href = "index.html";
+      return;
+    }
 
-      // Redirect immediately if logout triggered
-      authWrapper.on('logout', () => {
-        console.warn("User logged out, redirecting to login...");
-        location.href = 'index.html';
-      });
+    console.info("✅ Session validated, initializing app...");
+    await authWrapper.requireAuthOrRedirect('index.html');
+    if (typeof initApp === "function") initApp();
+  } catch (err) {
+    console.error("Auth initialization error:", err);
+    location.href = "index.html";
+  }
+});
     } catch (err) {
       console.error("Auth initialization error:", err);
       location.href = 'index.html';
@@ -36,25 +36,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   if (!window.initManager) window.initManager = new window.InitializationManager();
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      await authWrapper.init();
-      await authWrapper.requireAuthOrRedirect('index.html');
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await new Promise(res => setTimeout(res, 500)); // Wait for Supabase to restore session
+    const session = await authWrapper.getSession();
 
-      // Live session check every 60s
-      setInterval(async () => {
-        const session = await authWrapper.getSession();
-        if (!session) {
-          console.warn("Session expired, redirecting to login...");
-          location.href = 'index.html';
-        }
-      }, 60000);
+    if (!session) {
+      console.warn("No active session found. Redirecting...");
+      location.href = "index.html";
+      return;
+    }
 
-      // Redirect immediately if logout triggered
-      authWrapper.on('logout', () => {
-        console.warn("User logged out, redirecting to login...");
-        location.href = 'index.html';
-      });
+    console.info("✅ Session validated, initializing app...");
+    await authWrapper.requireAuthOrRedirect('index.html');
+    if (typeof initApp === "function") initApp();
+  } catch (err) {
+    console.error("Auth initialization error:", err);
+    location.href = "index.html";
+  }
+});
     } catch (err) {
       console.error("Auth initialization error:", err);
       location.href = 'index.html';
