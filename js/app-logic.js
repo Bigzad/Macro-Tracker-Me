@@ -1,5 +1,42 @@
 // app-logic.js — Fully Cleaned and Reconstructed Version (Async Safe, No Top-Level Await)
 
+
+// --- App Initialization Function ---
+window.initApp = async function () {
+  try {
+    console.info("[initApp] Initializing app UI...");
+
+    // Retrieve authenticated user info from Supabase
+    const { data: { user } = {} } = await window.supabaseClient.auth.getUser();
+
+    // If user found, greet them in the console and page
+    if (user && user.email) {
+      console.info(`[initApp] Welcome, ${user.email}`);
+      const banner = document.createElement('div');
+      banner.textContent = `Welcome, ${user.email}`;
+      banner.style.position = 'fixed';
+      banner.style.top = '10px';
+      banner.style.right = '10px';
+      banner.style.padding = '10px 16px';
+      banner.style.background = '#3F5B48';
+      banner.style.color = 'white';
+      banner.style.fontWeight = '600';
+      banner.style.borderRadius = '8px';
+      banner.style.zIndex = '9999';
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 5000);
+    } else {
+      console.warn("[initApp] No user info found.");
+    }
+
+    // Additional app logic placeholder
+    console.info("[initApp] Dashboard modules ready.");
+  } catch (err) {
+    console.error("[initApp] Initialization error:", err);
+  }
+};
+
+
 (async () => {
   try {
     // Ensure Supabase client is ready
