@@ -17,15 +17,15 @@
     <!-- Supabase Authentication System -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-init.js"></script>
+    
 
-    <script src="supabase-auth-wrapper.js"></script>
+    
     
     <!-- Security Middleware - Protects API endpoints -->
     <script src="security-middleware.js"></script>
     
     <!-- UUID-based Auth Helper -->
-    <script src="authHelper.js"></script>
+    
     
     <!-- COMPREHENSIVE ERROR HANDLING SYSTEM -->
     <script src="error-handling-system.js"></script>
@@ -11034,6 +11034,48 @@
             <p>Transform your nutrition, transform your life! 💪</p>
         </div>
     </div>
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      await authWrapper.requireAuthOrRedirect('index.html');
+      const session = await authWrapper.getSession();
+      if (session?.user) {
+        const email = session.user.email || 'User';
+        const nameEls = document.querySelectorAll('#desktop-user-name, #sidebar-user-email');
+        nameEls.forEach(el => el.textContent = email);
+      }
+      const logoutEls = document.querySelectorAll('#desktop-auth-button, #mobile-logout-btn');
+      logoutEls.forEach(btn => btn?.addEventListener('click', () => authWrapper.signOut()));
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
+
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      await authWrapper.requireAuthOrRedirect('index.html');
+      const session = await authWrapper.getSession();
+      if (session?.user) {
+        const email = session.user.email || 'User';
+        const els = document.querySelectorAll('#desktop-user-name, #sidebar-user-email');
+        els.forEach(el => el.textContent = email);
+      }
+      const logoutButtons = document.querySelectorAll('#desktop-auth-button, #mobile-logout-btn');
+      logoutButtons.forEach(btn => btn?.addEventListener('click', () => authWrapper.signOut()));
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
+
 </body>
 </html>`;
             
@@ -11368,6 +11410,48 @@
   // No additional handlers needed here to avoid refresh loops
   console.log("Netlify Identity widget loaded for app.html");
 </script>
+
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      await authWrapper.requireAuthOrRedirect('index.html');
+      const session = await authWrapper.getSession();
+      if (session?.user) {
+        const email = session.user.email || 'User';
+        const nameEls = document.querySelectorAll('#desktop-user-name, #sidebar-user-email');
+        nameEls.forEach(el => el.textContent = email);
+      }
+      const logoutEls = document.querySelectorAll('#desktop-auth-button, #mobile-logout-btn');
+      logoutEls.forEach(btn => btn?.addEventListener('click', () => authWrapper.signOut()));
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
+
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      await authWrapper.requireAuthOrRedirect('index.html');
+      const session = await authWrapper.getSession();
+      if (session?.user) {
+        const email = session.user.email || 'User';
+        const els = document.querySelectorAll('#desktop-user-name, #sidebar-user-email');
+        els.forEach(el => el.textContent = email);
+      }
+      const logoutButtons = document.querySelectorAll('#desktop-auth-button, #mobile-logout-btn');
+      logoutButtons.forEach(btn => btn?.addEventListener('click', () => authWrapper.signOut()));
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
 
 </body>
 </html>

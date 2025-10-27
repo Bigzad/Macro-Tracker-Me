@@ -61,10 +61,10 @@
     <!-- Supabase Authentication System -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="supabase-init.js"></script>
+    
 
 
-    <script src="supabase-auth-wrapper.js"></script>
+    
 
 <!-- COMPREHENSIVE ERROR HANDLING FOR AUTHENTICATION -->
 <script src="error-handling-system.js"></script>
@@ -1753,6 +1753,34 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 </script>
+
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      authWrapper.redirectIfAuthed('app.html');
+      authWrapper.on('login', () => location.href = 'app.html');
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
+
+
+  <!-- Unified Supabase Auth System -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await authWrapper.init();
+      authWrapper.redirectIfAuthed('app.html');
+      authWrapper.on('login', () => location.href = 'app.html');
+      authWrapper.on('logout', () => location.href = 'index.html');
+    });
+  </script>
 
 </body>
 </html>
