@@ -1,311 +1,195 @@
 /**
- * INITIALIZATION SEQUENCE MANAGER
- * 
- * Manages the proper loading and initialization order of all system components
- * Provides graceful fallbacks and prevents integration gaps
- * 
- * Features:
- * - Dependency tracking and waiting
- * - Initialization status monitoring
- * - Graceful degradation when components fail
- * - Non-breaking backward compatibility
+ * INITIALIZATION SEQUENCE MANAGER (Unified Auth Compatible)
+ * ----------------------------------------------------------
+ * - Compatible with auth-manager.js unified system
+ * - Automatically detects window.authWrapper (new system)
+ * - Keeps backward-safe tracking for other components
+ * - Minimal console output (only critical errors/warnings)
  */
 
 class InitializationManager {
-    constructor() {
-        this.components = new Map();
-        this.readyCallbacks = [];
-        this.initialized = false;
-        this.initializationStarted = false;
-        
-        // Track component readiness
-        this.componentStatus = {
-            supabaseClient: false,
-            errorHandler: false,
-            enhancedDB: false,
-            networkMonitor: false,
-            dbRecovery: false,
-            authWrapper: false,
-            safeJSON: false,
-            securityMiddleware: false
-        };
-        
-        // Initialize immediately if DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.startInitialization());
-        } else {
-            setTimeout(() => this.startInitialization(), 0);
-        }
-        
-        console.log('🔧 Initialization Manager created');
+  constructor() {
+    this.components = new Map();
+    this.readyCallbacks = [];
+    this.initialized = false;
+    this.initializationStarted = false;
+
+    this.componentStatus = {
+      supabaseClient: false,
+      errorHandler: false,
+      enhancedDB: false,
+      networkMonitor: false,
+      dbRecovery: false,
+      authWrapper: false,
+      safeJSON: false,
+      securityMiddleware: false,
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.startInitialization());
+    } else {
+      setTimeout(() => this.startInitialization(), 0);
     }
-    
-    /**
-     * Register a component as ready
-     */
-    registerComponent(name, instance = null) {
-        if (this.componentStatus.hasOwnProperty(name)) {
-            this.componentStatus[name] = true;
-            this.components.set(name, instance);
-            // Component registered: ${name}
-            
-            // Check if we can proceed with dependent initializations
-            this.checkDependencies();
-        } else {
-            console.warn(`⚠️ Unknown component registration: ${name}`);
-        }
+  }
+
+  registerComponent(name, instance = null) {
+    if (this.componentStatus.hasOwnProperty(name)) {
+      this.componentStatus[name] = true;
+      this.components.set(name, instance);
+      this.checkDependencies();
+    } else {
+      console.warn(`Unknown component registration: ${name}`);
     }
-    
-    /**
-     * Check if a component is ready
-     */
-    isComponentReady(name) {
-        return this.componentStatus[name] === true;
+  }
+
+  isComponentReady(name) {
+    return this.componentStatus[name] === true;
+  }
+
+  getComponent(name) {
+    return this.components.get(name) || null;
+  }
+
+  waitForComponents(componentNames, callback, timeout = 10000) {
+    const checkReady = () => {
+      const allReady = componentNames.every((n) => this.isComponentReady(n));
+      if (allReady) {
+        callback();
+        return true;
+      }
+      return false;
+    };
+    if (checkReady()) return;
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (checkReady()) clearInterval(interval);
+      else if (Date.now() - start > timeout) {
+        clearInterval(interval);
+        console.warn(`Timeout waiting for components: ${componentNames.join(", ")}`);
+        callback(true);
+      }
+    }, 100);
+  }
+
+  async startInitialization() {
+    if (this.initializationStarted) return;
+    this.initializationStarted = true;
+
+    try {
+      await this.initializePhase1();
+      await this.initializePhase2();
+      await this.initializePhase3();
+      await this.initializePhase4();
+      this.initialized = true;
+      this.executeReadyCallbacks();
+    } catch (err) {
+      console.error("Initialization failed:", err);
+      this.executeReadyCallbacks(true);
     }
-    
-    /**
-     * Get a component instance safely
-     */
-    getComponent(name) {
-        return this.components.get(name) || null;
+  }
+
+  async initializePhase1() {
+    if (typeof window.supabase !== "undefined" && window.supabaseClient) {
+      this.registerComponent("supabaseClient", window.supabaseClient);
     }
-    
-    /**
-     * Wait for specific components to be ready
-     */
-    waitForComponents(componentNames, callback, timeout = 10000) {
-        const checkReady = () => {
-            const allReady = componentNames.every(name => this.isComponentReady(name));
-            if (allReady) {
-                callback();
-                return true;
-            }
-            return false;
-        };
-        
-        // Check immediately
-        if (checkReady()) {
-            return;
-        }
-        
-        // Set up polling with timeout
-        const startTime = Date.now();
-        const pollInterval = setInterval(() => {
-            if (checkReady()) {
-                clearInterval(pollInterval);
-            } else if (Date.now() - startTime > timeout) {
-                clearInterval(pollInterval);
-                console.warn(`⚠️ Timeout waiting for components: ${componentNames.join(', ')}`);
-                // Call callback anyway with degraded functionality warning
-                callback(true); // true indicates timeout/degraded mode
-            }
-        }, 100);
+    await this.delay(300);
+  }
+
+  async initializePhase2() {
+    if (window.errorHandler) this.registerComponent("errorHandler", window.errorHandler);
+    if (window.JSON && window.JSON.safeParse)
+      this.registerComponent("safeJSON", window.JSON);
+    await this.delay(150);
+  }
+
+  async initializePhase3() {
+    if (window.enhancedDB) this.registerComponent("enhancedDB", window.enhancedDB);
+    if (window.networkMonitor) this.registerComponent("networkMonitor", window.networkMonitor);
+    if (window.dbRecovery) this.registerComponent("dbRecovery", window.dbRecovery);
+    await this.delay(200);
+  }
+
+  async initializePhase4() {
+    // Detect new unified auth wrapper gracefully
+    const tryRegisterAuth = () => {
+      if (window.authWrapper) {
+        this.registerComponent("authWrapper", window.authWrapper);
+        return true;
+      }
+      return false;
+    };
+
+    // Attempt detection up to 10 times (over 2s)
+    let attempts = 0;
+    while (!tryRegisterAuth() && attempts < 10) {
+      await this.delay(200);
+      attempts++;
     }
-    
-    /**
-     * Start the initialization sequence
-     */
-    async startInitialization() {
-        if (this.initializationStarted) {
-            return;
-        }
-        
-        this.initializationStarted = true;
-        console.info('🚀 Starting system initialization sequence...');
-        
-        try {
-            // Phase 1: Check for basic dependencies
-            await this.initializePhase1();
-            
-            // Phase 2: Initialize core systems
-            await this.initializePhase2();
-            
-            // Phase 3: Initialize enhanced features
-            await this.initializePhase3();
-            
-            // Phase 4: Final integration
-            await this.initializePhase4();
-            
-            this.initialized = true;
-            console.info('✅ System initialization complete');
-            this.executeReadyCallbacks();
-            
-        } catch (error) {
-            console.error('❌ Initialization failed:', error);
-            // Still execute callbacks with degraded mode flag
-            this.executeReadyCallbacks(true);
-        }
+
+    if (!this.isComponentReady("authWrapper")) {
+      console.warn("authWrapper not found after timeout (degraded mode).");
     }
-    
-    /**
-     * Phase 1: Basic Dependencies
-     */
-    async initializePhase1() {
-        // Phase 1: Basic dependencies
-        
-        // Check if Supabase is available
-        if (typeof window.supabase !== 'undefined' && window.supabaseClient) {
-            this.registerComponent('supabaseClient', window.supabaseClient);
-        }
-        
-        // Wait a moment for scripts to load
-        await this.delay(500);
-    }
-    
-    /**
-     * Phase 2: Core Systems
-     */
-    async initializePhase2() {
-        // Phase 2: Core systems
-        
-        // Check error handler
-        if (window.errorHandler) {
-            this.registerComponent('errorHandler', window.errorHandler);
-        }
-        
-        // Check safe JSON handler
-        if (window.JSON && window.JSON.safeParse) {
-            this.registerComponent('safeJSON', window.JSON);
-        }
-        
-        await this.delay(200);
-    }
-    
-    /**
-     * Phase 3: Enhanced Features
-     */
-    async initializePhase3() {
-        // Phase 3: Enhanced features
-        
-        // Check enhanced database functions
-        if (window.enhancedDB) {
-            this.registerComponent('enhancedDB', window.enhancedDB);
-        }
-        
-        // Check network monitor
-        if (window.networkMonitor) {
-            this.registerComponent('networkMonitor', window.networkMonitor);
-        }
-        
-        // Check database recovery
-        if (window.dbRecovery) {
-            this.registerComponent('dbRecovery', window.dbRecovery);
-        }
-        
-        await this.delay(300);
-    }
-    
-    /**
-     * Phase 4: Final Integration
-     */
-    async initializePhase4() {
-        // Phase 4: Final integration
-        
-        // Check auth wrapper
-        if (window.authWrapper || typeof authWrapper !== 'undefined') {
-            this.registerComponent('authWrapper', window.authWrapper || authWrapper);
-        }
-        
-        // Check security middleware
-        if (window.originalFetchStored) {
-            this.registerComponent('securityMiddleware', true);
-        }
-        
-        await this.delay(200);
-    }
-    
-    /**
-     * Add callback for when initialization is complete
-     */
-    onReady(callback) {
-        if (this.initialized) {
-            callback();
-        } else {
-            this.readyCallbacks.push(callback);
-        }
-    }
-    
-    /**
-     * Execute all ready callbacks
-     */
-    executeReadyCallbacks(degradedMode = false) {
-        this.readyCallbacks.forEach(callback => {
-            try {
-                callback(degradedMode);
-            } catch (error) {
-                console.error('Error in ready callback:', error);
-            }
-        });
-        this.readyCallbacks = [];
-    }
-    
-    /**
-     * Get system status report
-     */
-    getSystemStatus() {
-        const ready = Object.values(this.componentStatus).filter(status => status).length;
-        const total = Object.keys(this.componentStatus).length;
-        
-        return {
-            initialized: this.initialized,
-            readyComponents: ready,
-            totalComponents: total,
-            readinessPercentage: Math.round((ready / total) * 100),
-            componentStatus: { ...this.componentStatus },
-            missingComponents: Object.keys(this.componentStatus).filter(name => !this.componentStatus[name])
-        };
-    }
-    
-    /**
-     * Create safe accessor for global objects
-     */
-    createSafeAccessor(globalName, fallback = null) {
-        return () => {
-            const component = window[globalName];
-            if (component) {
-                return component;
-            }
-            
-            console.warn(`⚠️ ${globalName} not available, using fallback`);
-            return fallback;
-        };
-    }
-    
-    /**
-     * Utility: delay function
-     */
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    /**
-     * Check all dependencies and trigger ready state
-     */
-    checkDependencies() {
-        // Don't check if initialization hasn't started
-        if (!this.initializationStarted) {
-            return;
-        }
-        
-        const status = this.getSystemStatus();
-        // System readiness: ${status.readinessPercentage}% (${status.readyComponents}/${status.totalComponents})
-        // Missing components: ${status.missingComponents.join(', ')}
-    }
+
+    if (window.originalFetchStored) this.registerComponent("securityMiddleware", true);
+    await this.delay(150);
+  }
+
+  onReady(cb) {
+    if (this.initialized) cb();
+    else this.readyCallbacks.push(cb);
+  }
+
+  executeReadyCallbacks(degraded = false) {
+    this.readyCallbacks.forEach((cb) => {
+      try {
+        cb(degraded);
+      } catch (e) {
+        console.error("Error in ready callback:", e);
+      }
+    });
+    this.readyCallbacks = [];
+  }
+
+  getSystemStatus() {
+    const ready = Object.values(this.componentStatus).filter(Boolean).length;
+    const total = Object.keys(this.componentStatus).length;
+    return {
+      initialized: this.initialized,
+      readiness: Math.round((ready / total) * 100),
+      componentStatus: { ...this.componentStatus },
+    };
+  }
+
+  createSafeAccessor(globalName, fallback = null) {
+    return () => {
+      const comp = window[globalName];
+      if (comp) return comp;
+      console.warn(`${globalName} not available, using fallback`);
+      return fallback;
+    };
+  }
+
+  delay(ms) {
+    return new Promise((res) => setTimeout(res, ms));
+  }
+
+  checkDependencies() {
+    if (!this.initializationStarted) return;
+    // No verbose logging — silent unless critical.
+  }
 }
 
-// Create global instance
+// Global exposure
 window.initManager = new InitializationManager();
-
-// Create safe accessors for commonly used globals
-window.safeGetSupabaseClient = window.initManager.createSafeAccessor('supabaseClient', null);
-window.safeGetErrorHandler = window.initManager.createSafeAccessor('errorHandler', { 
-    logError: () => console.error, 
-    validateInput: () => ({ valid: true })
+window.safeGetSupabaseClient = window.initManager.createSafeAccessor("supabaseClient", null);
+window.safeGetErrorHandler = window.initManager.createSafeAccessor("errorHandler", {
+  logError: () => console.error,
+  validateInput: () => ({ valid: true }),
 });
-window.safeGetEnhancedDB = window.initManager.createSafeAccessor('enhancedDB', {
-    enhancedJSONParse: JSON.parse,
-    enhancedJSONStringify: JSON.stringify,
-    enhancedLocalStorage: localStorage
+window.safeGetEnhancedDB = window.initManager.createSafeAccessor("enhancedDB", {
+  enhancedJSONParse: JSON.parse,
+  enhancedJSONStringify: JSON.stringify,
+  enhancedLocalStorage: localStorage,
 });
 
-console.info('✅ Initialization Manager loaded');
+console.info("Initialization Manager (unified auth version) loaded.");
