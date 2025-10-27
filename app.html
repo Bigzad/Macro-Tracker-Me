@@ -12,17 +12,17 @@
 
     
     <!-- Initialization Manager - Must load after console manager -->
-    <script src="initialization-manager.js"></script>
+    
     
     <!-- Supabase Authentication System -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
+    
     
 
     
     
     <!-- Security Middleware - Protects API endpoints -->
-    <script src="security-middleware.js"></script>
+    
     
     <!-- UUID-based Auth Helper -->
     
@@ -1320,21 +1320,8 @@
 
 
     
-  <script src="supabase-config.js"></script>
-  <script src="auth-manager.js"></script>
   
-
-
-  <script src="supabase-config.js"></script>
-  <script src="auth-manager.js"></script>
   
-
-<!-- Unified Supabase Auth System -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="auth-manager.js"></script>
-<script src="initialization-manager.js"></script>
-<script src="security-middleware.js"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
@@ -1362,6 +1349,27 @@
     }
   });
 </script>
+
+<!-- Unified Supabase Auth System -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth-manager.js"></script>
+<script>
+  // Safe InitializationManager wrapper (singleton guard)
+  if (!window.InitializationManager) {
+    class InitializationManager {
+      constructor() {
+        if (window.initManager) return window.initManager;
+        window.initManager = this;
+        this.ready = false;
+      }
+    }
+    window.InitializationManager = InitializationManager;
+  }
+  if (!window.initManager) window.initManager = new window.InitializationManager();
+</script>
+<script src="initialization-manager.js"></script>
+<script src="security-middleware.js"></script>
 
 </body>
 </html>`;
@@ -1695,16 +1703,8 @@
 
 
 
-  <script src="supabase-config.js"></script>
-  <script src="auth-manager.js"></script>
   
-
-<!-- Unified Supabase Auth System -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="auth-manager.js"></script>
-<script src="initialization-manager.js"></script>
-<script src="security-middleware.js"></script>
+  
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
@@ -1733,6 +1733,28 @@
   });
 </script>
 
+<!-- Unified Supabase Auth System -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth-manager.js"></script>
+<script>
+  // Safe InitializationManager wrapper (singleton guard)
+  if (!window.InitializationManager) {
+    class InitializationManager {
+      constructor() {
+        if (window.initManager) return window.initManager;
+        window.initManager = this;
+        this.ready = false;
+      }
+    }
+    window.InitializationManager = InitializationManager;
+  }
+  if (!window.initManager) window.initManager = new window.InitializationManager();
+</script>
+<script src="initialization-manager.js"></script>
+<script src="security-middleware.js"></script>
+
 </body>
 </html>
+</script>
 </script>
