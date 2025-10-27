@@ -45,9 +45,6 @@ class InitializationManager {
   if (window.initManager && typeof window.initManager.executeReadyCallbacks === "function") {
     window.initManager.executeReadyCallbacks();
   }
-  if (window.initManager && typeof window.initManager.startInitialization === "function") {
-    window.initManager.startInitialization();
-  }
 }
   }
 
@@ -217,3 +214,42 @@ console.info("Initialization Manager (unified auth version) loaded.");
     window.initManager.startInitialization();
   }
 }
+
+
+// === Single-session validation gate ===
+;(function() {
+  try {
+    if (!window.initManager) return;
+    if (window.initManager.__sessionGateInstalled) return;
+    window.initManager.__sessionGateInstalled = true;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (window.initManager.sessionValidated) return;
+        let tries = 0;
+        while ((!window.authWrapper || !window.supabaseClient) && tries < 20) {
+          await new Promise(r => setTimeout(r, 100));
+          tries++;
+        }
+        await new Promise(r => setTimeout(r, 400));
+
+        const session = (window.authWrapper && await window.authWrapper.getSession()) || null;
+        if (!session) {
+          console.warn("No active session found. Redirecting to index.html");
+          window.location.href = "index.html";
+          return;
+        }
+
+        window.initManager.sessionValidated = true;
+        if (typeof window.initManager.executeReadyCallbacks === "function") {
+          window.initManager.executeReadyCallbacks();
+        }
+      } catch (e) {
+        console.error("InitializationManager session gate error:", e);
+        window.location.href = "index.html";
+      }
+    });
+  } catch (e) {
+    console.error("InitializationManager gate install failed:", e);
+  }
+})(); 

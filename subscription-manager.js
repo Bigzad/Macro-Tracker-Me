@@ -1,3 +1,4 @@
+if (!window.SubscriptionManager) {
 /**
  * SUBSCRIPTION MANAGEMENT SYSTEM
  * 
@@ -452,4 +453,6 @@ if (document.readyState === 'loading') {
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = SubscriptionManager;
+}
+  window.SubscriptionManager = SubscriptionManager;
 }
