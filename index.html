@@ -6,49 +6,7 @@
     <title>AI-Powered Macro Calculator - Login</title>
     
     <!-- Console Log Capture for Debugging -->
-    <script>
-        window.debugLogs = [];
-        const originalLog = console.log;
-        const originalError = console.error;
-        const originalWarn = console.warn;
-        
-        console.log = function(...args) {
-            window.debugLogs.push({type: 'log', time: new Date().toISOString(), args: args});
-            originalLog.apply(console, args);
-        };
-        
-        console.error = function(...args) {
-            window.debugLogs.push({type: 'error', time: new Date().toISOString(), args: args});
-            originalError.apply(console, args);
-        };
-        
-        console.warn = function(...args) {
-            window.debugLogs.push({type: 'warn', time: new Date().toISOString(), args: args});
-            originalWarn.apply(console, args);
-        };
-        
-        // Function to export logs
-        window.exportLogs = function() {
-            const logsText = window.debugLogs.map(log => 
-                `[${log.time}] ${log.type.toUpperCase()}: ${log.args.join(' ')}`
-            ).join('\n');
-            
-            const blob = new Blob([logsText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'console-logs.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-        
-        // Auto-save logs to localStorage
-        setInterval(() => {
-            localStorage.setItem('debugLogs', JSON.stringify(window.debugLogs));
-        }, 100);
-        
-        // Debug logging system ready
-    </script>
+    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
@@ -56,7 +14,12 @@
 
     
     <!-- Initialization Manager - Must load after simple logger -->
-    <script src="initialization-manager.js"></script>
+    <!-- Unified Supabase Auth System -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth-manager.js"></script>
+
+<script src="initialization-manager.js"></script>
     
     <!-- Supabase Authentication System -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
@@ -271,7 +234,7 @@
                 </div>
                 
                 <!-- Login Button -->
-                <button onclick="handleAuth()" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-3">
+                <button  class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-3">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Sign In to Continue</span>
                 </button>
@@ -344,853 +307,7 @@
         </div>
     </div>
 
-    <script>
-        // Custom Notification System
-        function showNotification(title, message, type = 'success', duration = 4000) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            const icons = {
-                success: 'fas fa-check-circle',
-                warning: 'fas fa-exclamation-triangle',
-                error: 'fas fa-times-circle',
-                info: 'fas fa-info-circle'
-            };
-            
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <i class="${icons[type]} notification-icon"></i>
-                    <div class="notification-text">
-                        <div class="notification-title">${title}</div>
-                        <div class="notification-message">${message}</div>
-                    </div>
-                    <button class="notification-close" onclick="closeNotification(this.parentElement.parentElement)">&times;</button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Trigger animation with mobile fix
-            setTimeout(() => {
-                notification.classList.add('show');
-                notification.style.opacity = '1';
-                notification.style.visibility = 'visible';
-            }, 100);
-            
-            // Auto remove
-            setTimeout(() => {
-                closeNotification(notification);
-            }, duration);
-        }
-        
-        function closeNotification(notification) {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.parentElement.removeChild(notification);
-                }
-            }, 300);
-        }
-
-        // Authentication will be implemented with Supabase
-        function initAuthentication() {
-            console.log('Authentication system to be implemented');
-            // Supabase auth will be added here
-        }
-        
-        // Placeholder functions for compatibility - replaced with full implementation below
-        
-        // Initialize Supabase Authentication System
-        function initSupabaseAuth() {
-            // Wait for authWrapper to be available
-            if (typeof authWrapper === 'undefined') {
-                setTimeout(initSupabaseAuth, 100);
-                return;
-            }
-            
-            // Simple Supabase Auth initialization
-            authWrapper.init();
-            
-            // Listen for authentication events
-            authWrapper.on('init', user => {
-                console.log('Auth system initialized');
-                // Check if user is already logged in
-                if (user) {
-                    // Check if this is a new signup from invite link
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const isInviteFlow = urlParams.has('confirmation_url') || 
-                                       urlParams.has('token_hash') || 
-                                       urlParams.has('type') ||
-                                       !user.email_confirmed_at; // Also check if email not confirmed yet
-                    
-                    if (isInviteFlow) {
-                        console.log('Invite/signup flow detected - collecting user info first');
-                        // Add small delay to ensure signup form is processed
-                        setTimeout(() => {
-                            checkAndCollectUserName(user);
-                        }, 1500);
-                    } else {
-                        // Check if this is an invitation flow before redirecting
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                        const isInvitationFlow = urlParams.get('type') === 'invite' || 
-                                               hashParams.get('type') === 'invite' || 
-                                               window.location.hash.includes('type=invite');
-                        
-                        if (isInvitationFlow) {
-                            console.log('🚫 Blocking redirect - invitation flow detected, letting signup form handle it');
-                            return; // Don't redirect, let invitation flow complete
-                        }
-                        
-                        // Normal login flow - redirect to main app
-                        console.log('Normal login flow - redirecting to app');
-                        redirectToApp(user);
-                    }
-                }
-            });
-            
-            authWrapper.on('login', user => {
-                console.log('User logged in:', user.user_metadata.full_name || user.email);
-                
-                // Check if this is a fresh signup that needs name collection
-                const needsNameCollection = !user.user_metadata.full_name || 
-                                          user.user_metadata.full_name.trim() === '';
-                
-                if (needsNameCollection) {
-                    console.log('New user needs to complete profile');
-                    // Enhanced name collection system
-                    checkAndCollectUserName(user);
-                } else {
-                    // Existing user with complete profile
-                    console.log('Existing user with complete profile - redirecting');
-                    redirectToApp(user);
-                }
-            });
-            
-            // Comprehensive name collection function
-            function checkAndCollectUserName(user) {
-                const hasName = user.user_metadata.full_name && user.user_metadata.full_name.trim() !== '';
-                
-                if (!hasName) {
-                    console.log('User missing full name - collecting now');
-                    
-                    // Create professional name collection modal
-                    showNameCollectionModal(user);
-                } else {
-                    console.log('User has full name:', user.user_metadata.full_name);
-                    proceedWithLogin(user);
-                }
-            }
-            
-            // Professional name collection modal
-            function showNameCollectionModal(user) {
-                // Store user for saveUserName function
-                window.currentModalUser = user;
-                // Create modal HTML
-                const modalHTML = `
-                    <div id="name-collection-modal" style="
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0,0,0,0.8);
-                        z-index: 999999;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 20px;
-                    ">
-                        <div style="
-                            background: white;
-                            border-radius: 16px;
-                            padding: 30px;
-                            max-width: 400px;
-                            width: 100%;
-                            text-align: center;
-                            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                        ">
-                            <div style="
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                margin: -30px -30px 20px -30px;
-                                padding: 20px 30px;
-                                border-radius: 16px 16px 0 0;
-                                color: white;
-                            ">
-                                <i class="fas fa-user-plus" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                <h2 style="margin: 0; font-size: 1.5rem;">Complete Your Profile</h2>
-                            </div>
-                            <p style="margin-bottom: 20px; color: #374151;">
-                                Please enter your full name to complete your account setup:
-                            </p>
-                            <input 
-                                type="text" 
-                                id="user-full-name-input" 
-                                placeholder="Enter your full name"
-                                style="
-                                    width: 100%;
-                                    padding: 12px 16px;
-                                    border: 2px solid #e5e7eb;
-                                    border-radius: 8px;
-                                    font-size: 1rem;
-                                    margin-bottom: 20px;
-                                    box-sizing: border-box;
-                                "
-                                autocomplete="name"
-                                required
-                            >
-                            <div style="display: flex; gap: 10px;">
-                                <button 
-                                    onclick="skipNameCollection()" 
-                                    style="
-                                        flex: 1;
-                                        padding: 12px 20px;
-                                        background: #f3f4f6;
-                                        color: #6b7280;
-                                        border: none;
-                                        border-radius: 8px;
-                                        cursor: pointer;
-                                        font-weight: 600;
-                                    "
-                                >
-                                    Skip for Now
-                                </button>
-                                <button 
-                                    onclick="saveUserName()" 
-                                    style="
-                                        flex: 2;
-                                        padding: 12px 20px;
-                                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                                        color: white;
-                                        border: none;
-                                        border-radius: 8px;
-                                        cursor: pointer;
-                                        font-weight: 600;
-                                    "
-                                >
-                                    Save & Continue
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Add modal to page
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
-                
-                // Focus on input
-                setTimeout(() => {
-                    document.getElementById('user-full-name-input').focus();
-                }, 100);
-                
-                // Handle Enter key
-                document.getElementById('user-full-name-input').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        saveUserName();
-                    }
-                });
-            }
-            
-            // Save user name function
-            window.saveUserName = async function() {
-                const nameInput = document.getElementById('user-full-name-input');
-                const fullName = nameInput.value.trim();
-                
-                if (fullName === '') {
-                    nameInput.style.borderColor = '#ef4444';
-                    nameInput.placeholder = 'Please enter your name';
-                    nameInput.focus();
-                    return;
-                }
-                
-                // Get current user from stored modal user
-                const user = window.currentModalUser;
-                if (user) {
-                    try {
-                        // Update user metadata using Supabase auth
-                        const { data, error } = await window.supabaseClient.auth.updateUser({
-                            data: { full_name: fullName }
-                        });
-                        
-                        if (error) {
-                            console.error('Error saving user name:', error);
-                        } else {
-                            console.log('User name saved successfully:', fullName);
-                        }
-                        
-                        // If user signed up with an invite code, redeem it now
-                        if (window.validInviteCode) {
-                            await redeemInviteCodeForUser(user, window.validInviteCode);
-                        }
-                        
-                        // Proceed with login
-                        removeNameModal();
-                        proceedWithLogin(user, fullName);
-                        
-                    } catch (error) {
-                        console.error('Error in user setup:', error);
-                        // Proceed anyway
-                        removeNameModal();
-                        proceedWithLogin(user, fullName);
-                    }
-                } else {
-                    console.warn('No user found, proceeding without saving name');
-                    removeNameModal();
-                    proceedWithLogin(null, fullName);
-                }
-            };
-
-            // Redeem invite code for user after successful registration
-            async function redeemInviteCodeForUser(user, inviteCodeInfo) {
-                try {
-                    const { data: inviteCodeData, type: codeType, code } = inviteCodeInfo;
-                    
-                    if (codeType === 'coach') {
-                        // Handle new coach invitation system
-                        
-                        // Create user profile with coach assignment and proper role
-                        const userProfileData = {
-                            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-                            user_id: user.id,
-                            user_email: user.email,
-                            user_name: user.user_metadata?.full_name || user.email,
-                            role: 'client', // Proper role assignment for coach invites
-                            assignment_status: 'assigned',
-                            assigned_coach: inviteCodeData.coach_email,
-                            assigned_coach_email: inviteCodeData.coach_email,
-                            coach_user_id: inviteCodeData.coach_user_id,  // Store coach's UUID for better relationships
-                            coach_invite_code: code,
-                            coach_assignment_date: new Date().toISOString(),
-                            role_assigned_at: new Date().toISOString(),
-                            role_assigned_by: 'coach_invitation_' + code,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        };
-
-                        const { error: profileError } = await window.supabaseClient
-                            .from('user_profiles')
-                            .insert([userProfileData]);
-
-                        if (profileError) {
-                            console.error('Error creating user profile:', profileError);
-                        }
-
-                        // Increment coach invitation code usage
-                        await window.supabaseClient
-                            .rpc('increment_invitation_code_usage', { input_code: code });
-
-                        console.log('Coach invitation code redeemed successfully:', code);
-                        console.log('User assigned to coach:', inviteCodeData.coach_email);
-                        
-                        // Show coach assignment success
-                        setTimeout(() => {
-                            showNotification('Welcome to the Team!', `You've been assigned to coach ${inviteCodeData.coach_name}!`, 'success');
-                        }, 1000);
-                        
-                    } else if (codeType === 'admin') {
-                        // Handle old admin invite system
-                        
-                        // Record the redemption
-                        const redemptionData = {
-                            invite_code_id: inviteCodeData.id,
-                            code: code,
-                            user_id: user.id,
-                            user_email: user.email,
-                            coach_email: inviteCodeData.coach_email,
-                            redeemed_at: new Date().toISOString(),
-                            metadata: {
-                                full_name: user.user_metadata?.full_name,
-                                email: user.email
-                            }
-                        };
-
-                        const { error: redemptionError } = await window.supabaseClient
-                            .from('invite_code_redemptions')
-                            .insert([redemptionData]);
-
-                        if (redemptionError) {
-                            console.error('Error recording redemption:', redemptionError);
-                        }
-
-                        // Create user profile for admin invite (with appropriate role)
-                        const adminUserProfileData = {
-                            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-                            user_id: user.id,
-                            user_email: user.email,
-                            user_name: user.user_metadata?.full_name || user.email,
-                            role: 'client', // Default to client for admin invites, can be changed later
-                            assignment_status: 'unassigned', // Admin invites don't auto-assign to coach
-                            coach_invite_code: code,
-                            role_assigned_at: new Date().toISOString(),
-                            role_assigned_by: 'admin_invitation_' + code,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        };
-
-                        const { error: adminProfileError } = await window.supabaseClient
-                            .from('user_profiles')
-                            .insert([adminUserProfileData]);
-
-                        if (adminProfileError) {
-                            console.error('Error creating admin user profile:', adminProfileError);
-                        }
-
-                        // Update the admin invite code usage
-                        const { error: updateError } = await window.supabaseClient
-                            .from('invite_codes')
-                            .update({
-                                current_uses: inviteCodeData.current_uses + 1,
-                                updated_at: new Date().toISOString()
-                            })
-                            .eq('id', inviteCodeData.id);
-
-                        if (updateError) {
-                            console.error('Error updating invite code:', updateError);
-                        }
-
-                        console.log('Admin invite code redeemed successfully:', code);
-                        
-                        // Show admin code success
-                        setTimeout(() => {
-                            showNotification('Welcome!', `Invite code "${code}" redeemed successfully!`, 'success');
-                        }, 1000);
-                    }
-                    
-                    // Clear the stored invite code
-                    delete window.validInviteCode;
-
-                } catch (error) {
-                    console.error('Failed to redeem invite code:', error);
-                }
-            }
-            
-            // Skip name collection
-            window.skipNameCollection = function() {
-                console.log('User skipped name collection');
-                const user = window.currentModalUser;
-                removeNameModal();
-                proceedWithLogin(user);
-            };
-            
-            // Remove name modal
-            function removeNameModal() {
-                const modal = document.getElementById('name-collection-modal');
-                if (modal) {
-                    modal.remove();
-                }
-                // Clean up stored user
-                window.currentModalUser = null;
-            }
-            
-            // Proceed with login after name collection
-            function proceedWithLogin(user, collectedName = null) {
-                const displayName = collectedName || user.user_metadata.full_name || user.email;
-                
-                showNotification('Welcome!', `Hello ${displayName}. Redirecting to application...`, 'success');
-                authWrapper.close();
-                
-                // Redirect to main app
-                setTimeout(() => {
-                    redirectToApp(user);
-                }, 1500);
-            }
-            
-            authWrapper.on('logout', () => {
-                console.log('User logged out');
-                showNotification('Signed Out', 'You have been logged out.', 'info');
-                // User is logged out, stay on login page
-            });
-            
-            authWrapper.on('error', err => {
-                console.error('Auth error:', err);
-                showNotification('Authentication Error', err.message || 'An error occurred during authentication.', 'error');
-            });
-            
-            authWrapper.on('close', () => {
-                console.log('Auth widget closed');
-            });
-        }
-        
-        // Initialize auth when page loads
-        initSupabaseAuth();
-        
-        // Redirect to main application
-        function redirectToApp(user) {
-            // Check if this is an invitation flow before redirecting
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            const isInvitationFlow = hashParams.get('type') === 'invite' || 
-                                   window.location.hash.includes('type=invite');
-            
-            if (isInvitationFlow) {
-                console.log('🚫 redirectToApp() blocked - invitation flow detected');
-                console.log('User needs to complete signup form first');
-                return; // Don't redirect during invitation
-            }
-            
-            console.log('Redirecting authenticated user to main app...');
-            // Store authentication state
-            localStorage.setItem('authenticated', 'true');
-            localStorage.setItem('user_info', JSON.stringify({
-                name: user.user_metadata.full_name || user.email,
-                email: user.email
-            }));
-            
-            // Redirect to app.html
-            window.location.href = 'app.html';
-        }
-        
-        // Show invite code redemption modal
-        function showInviteCodeModal() {
-            const modalHTML = `
-                <div id="invite-code-modal" style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    z-index: 999999;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 20px;
-                ">
-                    <div style="
-                        background: white;
-                        border-radius: 16px;
-                        padding: 30px;
-                        max-width: 450px;
-                        width: 100%;
-                        text-align: center;
-                        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                    ">
-                        <div style="
-                            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-                            margin: -30px -30px 20px -30px;
-                            padding: 20px 30px;
-                            border-radius: 16px 16px 0 0;
-                            color: white;
-                        ">
-                            <i class="fas fa-ticket-alt" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                            <h2 style="margin: 0; font-size: 1.5rem;">Enter Invitation Code</h2>
-                        </div>
-                        <p style="margin-bottom: 20px; color: #374151;">
-                            Enter your invitation code to create a new account:
-                        </p>
-                        <p style="margin-bottom: 15px; color: #6b7280; font-size: 0.875rem;">
-                            <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
-                            Supports both 8-character coach codes and 12-character admin codes
-                        </p>
-                        <input 
-                            type="text" 
-                            id="invite-code-input" 
-                            placeholder="Enter 8 or 12 character invite code"
-                            style="
-                                width: 100%;
-                                padding: 12px 16px;
-                                border: 2px solid #e5e7eb;
-                                border-radius: 8px;
-                                font-size: 1rem;
-                                margin-bottom: 20px;
-                                box-sizing: border-box;
-                                text-align: center;
-                                font-family: monospace;
-                                letter-spacing: 1px;
-                            "
-                            maxlength="12"
-                            minlength="8"
-                            required
-                        >
-                        <div id="invite-code-error" style="
-                            color: #dc2626;
-                            font-size: 0.875rem;
-                            margin-bottom: 15px;
-                            min-height: 20px;
-                        "></div>
-                        <div style="display: flex; gap: 10px;">
-                            <button 
-                                onclick="closeInviteCodeModal()" 
-                                style="
-                                    flex: 1;
-                                    padding: 12px 20px;
-                                    background: #f3f4f6;
-                                    color: #6b7280;
-                                    border: none;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-weight: 600;
-                                "
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                onclick="validateAndRedeemCode()" 
-                                style="
-                                    flex: 2;
-                                    padding: 12px 20px;
-                                    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-                                    color: white;
-                                    border: none;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-weight: 600;
-                                "
-                                id="redeem-code-btn"
-                            >
-                                <i class="fas fa-check mr-2"></i>
-                                Redeem Code
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Focus on input
-            setTimeout(() => {
-                document.getElementById('invite-code-input').focus();
-            }, 100);
-            
-            // Handle Enter key
-            document.getElementById('invite-code-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    validateAndRedeemCode();
-                }
-            });
-        }
-
-        // Close invite code modal
-        function closeInviteCodeModal() {
-            const modal = document.getElementById('invite-code-modal');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
-        // Validate and redeem invite code
-        async function validateAndRedeemCode() {
-            const codeInput = document.getElementById('invite-code-input');
-            const errorDiv = document.getElementById('invite-code-error');
-            const redeemBtn = document.getElementById('redeem-code-btn');
-            
-            const inviteCode = codeInput.value.trim().toUpperCase();
-            
-            // Clear previous errors
-            errorDiv.textContent = '';
-            
-            // Basic validation
-            if (!inviteCode) {
-                errorDiv.textContent = 'Please enter an invite code';
-                return;
-            }
-            
-            // Support both 8-character (coach) and 12-character (admin) codes
-            if (inviteCode.length !== 8 && inviteCode.length !== 12) {
-                errorDiv.textContent = 'Invite code must be 8 or 12 characters long';
-                return;
-            }
-            
-            // Show loading state
-            redeemBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Validating...';
-            redeemBtn.disabled = true;
-            
-            try {
-                let codeData = null;
-                let codeType = null;
-                
-                // Determine which system to check based on code length
-                if (inviteCode.length === 8) {
-                    // Check new coach invitation system
-                    const { data, error } = await window.supabaseClient
-                        .rpc('validate_invitation_code', { input_code: inviteCode });
-                    
-                    if (error) {
-                        throw new Error('Error validating coach invitation code');
-                    }
-                    
-                    if (!data || data.length === 0 || !data[0].is_valid) {
-                        throw new Error('Invalid or expired coach invitation code');
-                    }
-                    
-                    codeData = data[0];
-                    codeType = 'coach';
-                    
-                } else if (inviteCode.length === 12) {
-                    // Check old admin invite system
-                    const { data, error } = await window.supabaseClient
-                        .from('invite_codes')
-                        .select('*')
-                        .eq('code', inviteCode)
-                        .single();
-                    
-                    if (error || !data) {
-                        throw new Error('Invalid admin invite code');
-                    }
-                    
-                    // Check if code is still valid
-                    const now = new Date();
-                    const expiresAt = new Date(data.expires_at);
-                    
-                    if (now > expiresAt) {
-                        throw new Error('This invite code has expired');
-                    }
-                    
-                    if (!data.is_active) {
-                        throw new Error('This invite code has been deactivated');
-                    }
-                    
-                    if (data.current_uses >= data.max_uses && data.max_uses > 0) {
-                        throw new Error('This invite code has no remaining uses');
-                    }
-                    
-                    codeData = data;
-                    codeType = 'admin';
-                } else {
-                    throw new Error('Invalid code length');
-                }
-                
-                // Code is valid! Store it temporarily and redirect to invite.html
-                window.validInviteCode = {
-                    data: codeData,
-                    type: codeType,
-                    code: inviteCode
-                };
-                closeInviteCodeModal();
-                
-                // Show success message and redirect to invite.html with code parameter
-                showNotification('Valid Code!', 'Your invite code is valid. Redirecting to complete your account setup...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = `invite.html?code=${inviteCode}`;
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Invite code validation error:', error);
-                errorDiv.textContent = error.message || 'Failed to validate invite code';
-                
-                // Reset button
-                redeemBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Redeem Code';
-                redeemBtn.disabled = false;
-            }
-        }
-
-        // Handle authentication button click
-        async function handleAuth() {
-            // Check if core authentication systems are available
-            if (typeof window.SupabaseAuth === 'undefined' && !window.supabaseClient) {
-                showNotification('Loading', 'Authentication system is loading. Please wait a moment...', 'info');
-                
-                // Try again after a short delay
-                setTimeout(() => {
-                    if (typeof window.SupabaseAuth !== 'undefined' || window.supabaseClient) {
-                        handleAuth();
-                    } else {
-                        showNotification('Authentication Unavailable', 'Authentication system is not loaded. Please refresh the page.', 'error');
-                    }
-                }, 1000);
-                return;
-            }
-            
-            try {
-                // Try to get current user using available authentication methods
-                let user = null;
-                
-                if (window.SupabaseAuth && window.SupabaseAuth.getCurrentUser) {
-                    user = await window.SupabaseAuth.getCurrentUser();
-                } else if (window.supabaseClient) {
-                    const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
-                    user = currentUser;
-                }
-                
-                if (user) {
-                    // DEBUG: Add detailed logging
-                    // User authentication detected
-                    
-                    // Check if this is an invitation signup (authenticated but profile incomplete)
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Parse hash params correctly
-                    const typeParam = urlParams.get('type');
-                    const hashTypeParam = hashParams.get('type');
-                    const hashIncludes = window.location.hash.includes('type=invite');
-                    const noFullName = !user.user_metadata.full_name;
-                    
-                    const isInvitationFlow = typeParam === 'invite' || hashTypeParam === 'invite' || hashIncludes || noFullName;
-                    
-                    // Process authentication flow immediately
-                    if (isInvitationFlow) {
-                        console.log('✅ Invitation user detected - showing signup form for profile completion:', user.email);
-                        // Don't redirect - let them complete their profile
-                        if (window.authWrapper && window.authWrapper.open) {
-                            window.authWrapper.open('signup');
-                            showNotification('Complete Your Profile', 'Please complete your profile setup to continue.', 'info');
-                        }
-                    } else {
-                        // User is already logged in with complete profile, redirect to main app
-                        console.log('➡️ User already authenticated with complete profile, redirecting to app:', user.email);
-                        redirectToApp(user);
-                    }
-                } else {
-                    // User is not logged in, try to open auth modal or show message
-                    if (window.authWrapper && window.authWrapper.open) {
-                        window.authWrapper.open('login');
-                        showNotification('Sign In', 'Please use your account credentials to log in.', 'info');
-                    } else {
-                        // Fallback: Show informative message about authentication
-                        showNotification('Authentication Required', 
-                            'Please sign in to access the application. The authentication system will be available shortly.', 
-                            'info');
-                        console.log('ℹ️ Authentication wrapper not available, showing informative message');
-                    }
-                }
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showNotification('Authentication Error', 'Unable to check authentication status. Please try again.', 'error');
-            }
-        }
-        
-        // Initialize Supabase Auth when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Login page loaded');
-            
-            // Use initialization manager to check auth systems if available
-            function checkAuthSystems() {
-                // Check if Supabase Auth is available
-                if (typeof window.SupabaseAuth === 'undefined' || typeof window.authWrapper === 'undefined') {
-                    console.log('ℹ️ Standard auth wrapper not available, using core authentication systems');
-                    
-                    // Only show error notification if Supabase client is also not working
-                    if (!window.supabaseClient || !window.enhancedDB) {
-                        console.log('❌ Core authentication systems not available - showing configuration notice');
-                        setTimeout(() => {
-                            showNotification('Configuration Notice', 'Please ensure Supabase is properly configured. Check the console for details.', 'warning');
-                        }, 2000);
-                        return;
-                    } else {
-                        console.log('✅ Core authentication systems active - continuing without standard auth wrapper');
-                    }
-                } else {
-                    console.log('✅ Full Supabase Auth system available');
-                }
-                
-                // Auth is initialized automatically by authWrapper
-                console.log('Supabase Auth ready');
-            }
-            
-            // Check auth systems with proper debugging
-            function delayedAuthCheck() {
-                checkAuthSystems();
-            }
-            
-            // Give scripts time to load, then check auth systems
-            if (window.initManager) {
-                // Wait for a moment to let scripts load
-                setTimeout(delayedAuthCheck, 500);
-            } else {
-                setTimeout(delayedAuthCheck, 100);
-            }
-        });
-    </script>
+    
 
     <!-- Unified Auth Script -->
     
@@ -1755,8 +872,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-  <!-- Unified Supabase Auth System -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="auth-manager.js"></script>
   <script>
@@ -1871,7 +986,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('login-modal');
-    const openBtn = document.querySelector('#sign-in-btn, button[onclick="handleAuth()"]');
+    const openBtn = document.querySelector('#sign-in-btn, button[]');
     const cancelBtn = document.getElementById('login-cancel');
     const submitBtn = document.getElementById('login-submit');
     const emailField = document.getElementById('login-email');
@@ -1929,6 +1044,64 @@ document.addEventListener('DOMContentLoaded', function() {
     passField.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Remove any legacy inline onclick handlers that call handleAuth
+    document.querySelectorAll('[onclick*="handleAuth"]').forEach(el => el.removeAttribute('onclick'));
+
+    const modal = document.getElementById('login-modal');
+    const openBtn = document.getElementById('sign-in-btn') || document.querySelector('button[onclick*="handleAuth"]');
+    const cancelBtn = document.getElementById('login-cancel');
+    const submitBtn = document.getElementById('login-submit');
+    const emailField = document.getElementById('login-email');
+    const passField = document.getElementById('login-password');
+    const errorEl = document.getElementById('login-error');
+
+    function openModal() {
+      if (!modal) return;
+      modal.style.display = 'flex';
+      setTimeout(() => emailField && emailField.focus(), 0);
+    }
+    function closeModal() {
+      if (!modal) return;
+      modal.style.display = 'none';
+      if (errorEl) errorEl.textContent = '';
+      if (emailField) emailField.value = '';
+      if (passField) passField.value = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    async function handleLogin() {
+      const email = (emailField && emailField.value || '').trim();
+      const password = (passField && passField.value || '').trim();
+      if (!email || !password) {
+        if (errorEl) errorEl.textContent = "Please enter both email and password.";
+        return;
+      }
+      try {
+        const { error } = await authWrapper.signIn(email, password);
+        if (error) {
+          if (errorEl) errorEl.textContent = error.message || "Invalid credentials.";
+          if (typeof showNotification === 'function') showNotification("Login Failed", error.message || "Invalid credentials.", "error");
+        } else {
+          if (typeof showNotification === 'function') showNotification("Login Successful", "Redirecting...", "success");
+          setTimeout(() => location.href = 'app.html', 600);
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        if (errorEl) errorEl.textContent = "An unexpected error occurred.";
+      }
+    }
+
+    if (submitBtn) submitBtn.addEventListener('click', handleLogin);
+    if (passField) passField.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
   });
 </script>
 
